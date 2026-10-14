@@ -1,0 +1,57 @@
+---
+import Button from './Button.astro';
+import { site } from '../config/site';
+---
+
+<form class="newsletter" data-form="newsletter" data-endpoint={site.formEndpoint} data-email={site.email} data-astro-reload novalidate>
+  <p class="label label--cool" id="newsletter-title">Newsletter</p>
+  <div class="newsletter__row" data-field>
+    <label class="sr-only" for="newsletter-email">Votre adresse e-mail</label>
+    <input
+      class="field__control"
+      id="newsletter-email"
+      name="email"
+      type="email"
+      placeholder="Votre e-mail"
+      autocomplete="email"
+      required
+      aria-describedby="newsletter-email-error"
+      aria-labelledby="newsletter-title"
+    />
+    <Button type="submit" variant="outline" size="sm" magnetic={false}>S'inscrire</Button>
+    <p class="field__error t-small newsletter__error" id="newsletter-email-error" data-error></p>
+  </div>
+  <label class="check" data-field>
+    <input type="checkbox" name="consent" required />
+    <span>[À FOURNIR : texte de consentement à la newsletter]</span>
+  </label>
+  <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+  <p class="form-status" role="status" aria-live="polite" data-status></p>
+</form>
+
+<style>
+  .newsletter {
+    display: grid;
+    gap: var(--space-3);
+    max-width: 440px;
+  }
+
+  .newsletter__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: var(--space-2);
+    align-items: start;
+  }
+
+  .newsletter__row :global(.field__control) {
+    min-width: 0;
+    min-height: 40px;
+    padding-block: 8px;
+    border-radius: var(--radius-pill);
+    padding-inline: var(--space-4);
+  }
+
+  .newsletter__error {
+    grid-column: 1 / -1;
+  }
+</style>

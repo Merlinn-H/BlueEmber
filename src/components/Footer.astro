@@ -1,0 +1,140 @@
+---
+import Logo from './Logo.astro';
+import Newsletter from './Newsletter.astro';
+import { site } from '../config/site';
+import { externalHref, mailto } from '../lib/placeholders';
+
+const socials = [
+  { label: 'Instagram', href: externalHref(site.social.instagram) },
+  { label: 'LinkedIn', href: externalHref(site.social.linkedin) },
+];
+---
+
+<footer class="site-footer" data-ember-intensity="0.6">
+  <div class="site-footer__inner container">
+    <div class="site-footer__brand">
+      <a class="site-footer__logo" href="/" aria-label="Blue Ember agency, accueil">
+        <Logo variant="dark" size={64} />
+      </a>
+      <a class="site-footer__mail" href={mailto(site.email)}>{site.email}</a>
+      <ul class="site-footer__social" aria-label="Réseaux sociaux">
+        {
+          socials.map((social) => (
+            <li>
+              <a
+                href={social.href}
+                target={social.href === '#' ? undefined : '_blank'}
+                rel={social.href === '#' ? undefined : 'noopener noreferrer'}
+              >
+                {social.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <nav class="site-footer__legal" aria-label="Informations légales">
+      <ul>
+        <li><a href="/mentions-legales">Mentions légales</a></li>
+        <li><a href="/confidentialite">Confidentialité</a></li>
+      </ul>
+    </nav>
+
+    <div class="site-footer__newsletter">
+      <Newsletter />
+    </div>
+  </div>
+
+  <div class="site-footer__bottom container">
+    <p class="t-small t-muted">© {site.year} Blue Ember</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    background: var(--surface-cool-90);
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-5);
+  }
+
+  .site-footer__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: var(--space-7) var(--space-4);
+  }
+
+  .site-footer__brand {
+    display: grid;
+    gap: var(--space-4);
+    align-content: start;
+    justify-items: start;
+  }
+
+  /* Big logo, fluid on small screens (the inline size from the component is overridden) */
+  .site-footer__logo :global(.logo) {
+    --logo-size: clamp(40px, 11.5vw, 64px) !important;
+  }
+
+  .site-footer__mail {
+    font-size: var(--fs-lead);
+    line-height: var(--lh-lead);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 6px;
+    transition: text-decoration-color var(--dur-fast) var(--ease-out-expo);
+  }
+
+  .site-footer__mail:hover {
+    text-decoration-color: var(--flamme);
+  }
+
+  .site-footer__social,
+  .site-footer__legal ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+  }
+
+  .site-footer__social a,
+  .site-footer__legal a {
+    color: var(--ink-muted);
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+    transition: color var(--dur-fast) var(--ease-out-expo);
+  }
+
+  .site-footer__social a:hover,
+  .site-footer__legal a:hover {
+    color: var(--ink);
+  }
+
+  .site-footer__legal ul {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+
+  .site-footer__bottom {
+    margin-top: var(--space-7);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+  }
+
+  @media (min-width: 900px) {
+    .site-footer__inner {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+    }
+
+    .site-footer__brand {
+      grid-column: 1 / span 5;
+    }
+
+    .site-footer__legal {
+      grid-column: 7 / span 2;
+    }
+
+    .site-footer__newsletter {
+      grid-column: 9 / span 4;
+    }
+  }
+</style>

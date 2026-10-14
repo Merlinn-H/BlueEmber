@@ -1,0 +1,49 @@
+---
+// Strip of projects, full width and out of the grid. Cards 480 x 600 (desktop), 280 x 360 (mobile).
+import type { CollectionEntry } from 'astro:content';
+import Marquee from './Marquee.astro';
+import ProjectCard from './ProjectCard.astro';
+
+interface Props {
+  projects: CollectionEntry<'projets'>[];
+}
+const { projects } = Astro.props;
+---
+
+<Marquee class="project-strip" label="Réalisations" speed={40} speedMobile={30} hoverSpeed={10} drag boost parallax={60}>
+  {
+    projects.map((project) => (
+      <li class="project-strip__item">
+        <ProjectCard project={project} />
+      </li>
+    ))
+  }
+</Marquee>
+
+<style is:global>
+  .project-strip__item {
+    flex: none;
+    width: 280px;
+  }
+
+  .project-strip .project-card__media {
+    aspect-ratio: auto;
+    height: 360px;
+  }
+
+  @media (min-width: 768px) {
+    .project-strip__item {
+      width: 480px;
+    }
+
+    .project-strip .project-card__media {
+      height: 600px;
+    }
+  }
+
+  /* Titles stay readable under the cursor while the band moves */
+  .project-strip .project-card__title,
+  .project-strip .project-card__meta {
+    padding-right: var(--space-3);
+  }
+</style>

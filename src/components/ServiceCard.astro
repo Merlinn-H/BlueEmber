@@ -1,0 +1,108 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Icon from './Icon.astro';
+
+interface Props {
+  service: CollectionEntry<'services'>;
+}
+const { service } = Astro.props;
+const { number, title, short } = service.data;
+---
+
+<article class="service-card">
+  <p class="label">{number}</p>
+  <h3 class="service-card__title t-h3">{title}</h3>
+  <p class="service-card__text">{short}</p>
+  <a class="service-card__link" href={`/services#${service.id}`}>
+    <span>En savoir plus</span>
+    <Icon name="arrow-right" />
+  </a>
+</article>
+
+<style>
+  .service-card {
+    position: relative;
+    display: grid;
+    align-content: start;
+    gap: var(--space-2);
+    height: 100%;
+    padding: var(--space-5);
+    background: var(--surface-raised);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+  }
+
+  .service-card__title {
+    margin-top: var(--space-1);
+  }
+
+  /* Description : body ink-muted, 2 lignes maximum */
+  .service-card__text {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    overflow: hidden;
+    min-height: calc(var(--lh-body) * 2);
+    color: var(--ink-muted);
+  }
+
+  .service-card__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-4);
+    justify-self: start;
+    font-size: var(--fs-button);
+    line-height: var(--lh-button);
+    font-weight: 600;
+    color: var(--ink-muted);
+    transition: color var(--dur-fast) var(--ease-out-expo);
+  }
+
+  /* The whole card is the hit area of the link */
+  .service-card__link::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .service-card__link :global(.icon) {
+    transition: transform var(--dur-fast) var(--ease-out-expo);
+  }
+
+  /* Filet flamme de 2px qui se dessine en bas, de gauche a droite */
+  .service-card::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 2px;
+    background: var(--flamme);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform var(--dur-mid) var(--ease-out-expo);
+  }
+
+  .service-card:hover::after,
+  .service-card:focus-within::after {
+    transform: scaleX(1);
+  }
+
+  .service-card:hover .service-card__link,
+  .service-card:focus-within .service-card__link {
+    color: var(--ivoire);
+  }
+
+  .service-card:hover .service-card__link :global(.icon) {
+    transform: translateX(4px);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .service-card::after,
+    .service-card__link :global(.icon) {
+      transition: none;
+    }
+  }
+</style>

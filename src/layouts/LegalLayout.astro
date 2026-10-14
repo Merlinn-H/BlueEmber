@@ -1,0 +1,59 @@
+---
+// Shared shell of the legal pages: h1 + readable prose column. No ember effect to speak of (0.2).
+import BaseLayout from './BaseLayout.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  heading: string;
+  ogImage: string;
+}
+const { title, description, heading, ogImage } = Astro.props;
+---
+
+<BaseLayout title={title} description={description} ember="legal" ogImage={ogImage}>
+  <section class="page-hero" aria-labelledby="page-title" data-ember-intensity="0.2">
+    <div class="container page-hero__inner">
+      <h1 class="page-hero__title" id="page-title" data-split>{heading}</h1>
+    </div>
+  </section>
+  <section class="section section--flush-top" data-ember-intensity="0.2">
+    <div class="container">
+      <div class="legal prose measure" data-ember="calm">
+        <slot />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  .legal {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .legal section {
+    display: grid;
+    gap: var(--space-3);
+  }
+
+  .legal h2 {
+    font-size: var(--fs-h3);
+    line-height: var(--lh-h3);
+  }
+
+  .legal dl {
+    display: grid;
+    gap: var(--space-2) var(--space-4);
+    grid-template-columns: minmax(130px, auto) 1fr;
+    margin: 0;
+  }
+
+  .legal dt {
+    color: var(--ink-muted);
+  }
+
+  .legal dd {
+    margin: 0;
+  }
+</style>

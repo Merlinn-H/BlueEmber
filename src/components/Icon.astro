@@ -1,0 +1,31 @@
+---
+interface Props {
+  name: 'arrow-right' | 'arrow-down';
+  class?: string;
+}
+const { name, class: className } = Astro.props;
+---
+
+<svg
+  class:list={['icon', `icon--${name}`, className]}
+  viewBox="0 0 16 16"
+  width="16"
+  height="16"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.5"
+  stroke-linecap="square"
+  aria-hidden="true"
+  focusable="false"
+>
+  {name === 'arrow-right' && <path d="M2 8h11M9 4l4 4-4 4" />}
+  {name === 'arrow-down' && <path d="M8 2v11M4 9l4 4 4-4" />}
+</svg>
+
+<style>
+  .icon {
+    flex: none;
+    width: 16px;
+    height: 16px;
+  }
+</style>

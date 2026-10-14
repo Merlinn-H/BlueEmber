@@ -1,0 +1,364 @@
+/* Reset, typographie, mise en page et utilitaires globaux. */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  color-scheme: dark;
+  background: var(--charbon);
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--surface);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+  font-weight: 400;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: clip;
+}
+
+img,
+svg,
+video,
+canvas {
+  display: block;
+  max-width: 100%;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+ul,
+ol,
+figure,
+blockquote,
+dl,
+dd {
+  margin: 0;
+}
+
+ul,
+ol {
+  padding: 0;
+  list-style: none;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+button {
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+
+::selection {
+  background: var(--titane-chauffe);
+  color: var(--ivoire);
+}
+
+/* Lenis (defilement fluide) */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+
+.lenis [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+/* Scroll lock (menu open, page transition), with or without Lenis */
+html.is-locked {
+  overflow: hidden;
+}
+
+main:focus {
+  outline: none;
+}
+
+/* Focus : anneau 2px, decale de 3px, toujours visible au clavier */
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Typographie : titres en Bodoni Moda 500, textes en Instrument Sans */
+h1,
+h2,
+h3,
+.t-hero,
+.t-h1,
+.t-h2,
+.t-h3 {
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.t-hero {
+  font-size: var(--fs-hero);
+  line-height: var(--lh-hero);
+}
+
+h1,
+.t-h1 {
+  font-size: var(--fs-h1);
+  line-height: var(--lh-h1);
+}
+
+h2,
+.t-h2 {
+  font-size: var(--fs-h2);
+  line-height: var(--lh-h2);
+}
+
+h3,
+.t-h3 {
+  font-size: var(--fs-h3);
+  line-height: var(--lh-h3);
+}
+
+.t-hero,
+.t-h1,
+.t-h2,
+.t-h3 {
+  font-weight: 500;
+}
+
+.t-lead {
+  font-size: var(--fs-lead);
+  line-height: var(--lh-lead);
+}
+
+.t-body {
+  font-size: var(--fs-body);
+  line-height: var(--lh-body);
+}
+
+.t-small {
+  font-size: var(--fs-small);
+  line-height: var(--lh-small);
+}
+
+.t-muted {
+  color: var(--ink-muted);
+}
+
+/* Surtitres : majuscules, espaces de 0,22em, or ou titane-pale */
+.label {
+  font-family: var(--font-body);
+  font-size: var(--fs-label);
+  line-height: var(--lh-label);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.22em;
+  color: var(--or);
+}
+
+.label--cool {
+  color: var(--titane-pale);
+}
+
+/* Texte courant limite a 65 caracteres par ligne */
+.measure {
+  max-width: 65ch;
+}
+
+/* Mise en page */
+.container {
+  width: 100%;
+  max-width: var(--max-w);
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.section {
+  position: relative;
+  padding-block: var(--space-8);
+}
+
+.section--cool {
+  background: var(--surface-cool-85);
+}
+
+.section--flush-top {
+  padding-top: 0;
+}
+
+.section-head {
+  display: grid;
+  gap: var(--space-2);
+  margin-bottom: var(--space-7);
+}
+
+/* Section label on the left, a control on the right (e.g. the pause button of a band) */
+.section-head--split {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+}
+
+.grid-12 {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--space-4);
+}
+
+.stack > * + * {
+  margin-top: var(--stack-gap, var(--space-4));
+}
+
+/* Hero des pages interieures : surtitre, h1 sur lignes courtes, chapeau */
+.page-hero {
+  padding-top: calc(var(--nav-h) + var(--space-8));
+  padding-bottom: var(--space-7);
+}
+
+.page-hero__inner {
+  display: grid;
+  gap: var(--space-4);
+  justify-items: start;
+}
+
+.page-hero__title {
+  width: fit-content;
+}
+
+/* Text columns stay out of the fragment: with a fragment on the left they start to its right (--fragment-inset
+   is set per page on <body>). Right-hand fragments sit in the right margin and need no offset. */
+@media (min-width: 768px) {
+  .container.avoid-fragment,
+  .page-hero__inner.container {
+    padding-left: calc(var(--gutter) + var(--fragment-inset, 0px));
+  }
+}
+
+/* Contenu Markdown */
+.prose > * + * {
+  margin-top: var(--space-3);
+}
+
+.prose a {
+  text-decoration: underline;
+  text-decoration-color: var(--flamme);
+  text-underline-offset: 4px;
+}
+
+/* Accessibilite */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  left: var(--space-3);
+  top: var(--space-3);
+  z-index: 10000;
+  transform: translateY(-250%);
+  background: var(--ivoire);
+  color: var(--charbon);
+  padding: 12px 20px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-button);
+  line-height: var(--lh-button);
+  font-weight: 600;
+}
+
+.skip-link:focus {
+  transform: none;
+}
+
+/* Contenu au-dessus de la scene fixe (Ambiance, canvas, fragment) */
+main,
+.site-footer {
+  position: relative;
+  z-index: var(--z-content);
+}
+
+/* Fond Ambiance reutilisable (menu mobile, par exemple), identique au CSS du design system */
+.ambiance-surface {
+  background:
+    radial-gradient(
+      ellipse 70% 80% at 0% 0%,
+      rgba(76, 120, 168, 0.95) 0%,
+      rgba(47, 70, 112, 0.7) 30%,
+      rgba(27, 39, 51, 0.3) 55%,
+      rgba(27, 39, 51, 0) 72%
+    ),
+    radial-gradient(
+      ellipse 70% 80% at 100% 100%,
+      rgba(240, 90, 28, 0.95) 0%,
+      rgba(214, 78, 30, 0.6) 30%,
+      rgba(110, 35, 15, 0.25) 55%,
+      rgba(110, 35, 15, 0) 72%
+    ),
+    var(--charbon);
+}
+
+/* Curseur personnalise : le curseur systeme est masque uniquement quand le disque est actif,
+   sauf sur les champs de formulaire. */
+html.cursor-on,
+html.cursor-on * {
+  cursor: none !important;
+}
+
+html.cursor-on :is(input, textarea, select, [contenteditable='true']) {
+  cursor: auto !important;
+}
+
+html.cursor-on :is(input[type='text'], input[type='email'], input[type='tel'], textarea) {
+  cursor: text !important;
+}
+
+/* Titres decoupes en lignes (SplitText) : le masque ne doit pas rogner les jambages de Bodoni */
+.split-line-mask {
+  padding-block: 0.12em;
+  margin-block: -0.12em;
+}
+
+/* Mouvement reduit */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}

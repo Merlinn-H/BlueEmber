@@ -1,0 +1,60 @@
+---
+// Three numbered steps. Same component on the home page and on Services.
+interface Props {
+  tone?: 'default' | 'cool';
+  id?: string;
+}
+const { tone = 'cool', id = 'approach' } = Astro.props;
+
+const steps = [
+  { number: '01', title: 'Comprendre' },
+  { number: '02', title: 'Créer' },
+  { number: '03', title: 'Faire grandir' },
+];
+---
+
+<section class:list={['section', tone === 'cool' && 'section--cool']} aria-labelledby={`${id}-title`} data-ember-intensity="0.6">
+  <div class="container">
+    <div class="section-head">
+      <h2 class="label label--cool" id={`${id}-title`} data-reveal>Approche</h2>
+    </div>
+    <ol class="approach">
+      {
+        steps.map((step) => (
+          <li class="approach__step" data-reveal>
+            <p class="label">{step.number}</p>
+            <h3 class="t-h3">{step.title}</h3>
+            <p class="approach__text t-muted" data-ember="calm">
+              [À FOURNIR : texte de l'étape, 2 lignes]
+            </p>
+          </li>
+        ))
+      }
+    </ol>
+  </div>
+</section>
+
+<style>
+  .approach {
+    display: grid;
+    gap: var(--space-6) var(--space-4);
+  }
+
+  .approach__step {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+  }
+
+  .approach__text {
+    max-width: 40ch;
+  }
+
+  @media (min-width: 900px) {
+    .approach {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+</style>

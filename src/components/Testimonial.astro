@@ -1,0 +1,64 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  testimonial: CollectionEntry<'temoignages'>;
+}
+const { quote, author, role, company, photo } = Astro.props.testimonial.data;
+---
+
+<figure class="testimonial" data-ember="calm">
+  <blockquote class="testimonial__quote t-h2" data-split>{quote}</blockquote>
+  <figcaption class="testimonial__author">
+    <img class="testimonial__photo" src={photo} width="48" height="48" alt="" loading="lazy" decoding="async" />
+    <div>
+      <p class="testimonial__name">{author}</p>
+      <p class="t-small t-muted">{role}, {company}</p>
+    </div>
+  </figcaption>
+</figure>
+
+<style>
+  .testimonial {
+    display: grid;
+    gap: var(--space-6);
+    margin: 0;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  /* Citation en Bodoni, graisse 400 (effet "italique" sans fausse italique) */
+  .testimonial__quote {
+    font-weight: 400;
+    quotes: '\00ab\00a0' '\00a0\00bb';
+    max-width: 24ch;
+  }
+
+  .testimonial__quote::before {
+    content: open-quote;
+  }
+
+  .testimonial__quote::after {
+    content: close-quote;
+  }
+
+  .testimonial__author {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  /* Photo ronde de 48px */
+  .testimonial__photo {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--surface-raised);
+  }
+
+  .testimonial__name {
+    font-weight: 600;
+    line-height: var(--lh-small);
+  }
+</style>

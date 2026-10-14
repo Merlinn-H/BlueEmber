@@ -1,0 +1,218 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { site } from '../config/site';
+import { professionalService } from '../lib/seo';
+
+const team = (await getCollection('equipe')).sort((a, b) => a.data.order - b.data.order);
+const founder = team.find((member) => member.data.founder) ?? team[0];
+
+const values = [
+  { title: 'Luxe', text: '[À FOURNIR : texte sur cette valeur, 2 lignes]' },
+  { title: 'Chaleur', text: '[À FOURNIR : texte sur cette valeur, 2 lignes]' },
+  { title: 'Précision', text: '[À FOURNIR : texte sur cette valeur, 2 lignes]' },
+];
+---
+
+<BaseLayout
+  title={`L'agence · Équipe et méthode · Blue Ember ${site.city}`}
+  description="Rencontrez l'équipe Blue Ember et notre façon de travailler : luxe, chaleur, précision."
+  ember="agence"
+  ogImage="agence"
+  jsonLd={[professionalService(Astro.site!.origin)]}
+>
+  <section class="page-hero" aria-labelledby="page-title" data-ember-intensity="0.6">
+    <div class="container page-hero__inner">
+      <p class="label label--cool" data-reveal>L'agence</p>
+      <h1 class="page-hero__title" id="page-title" data-split data-ember="soft">Une équipe<br />à votre service.</h1>
+      <p class="t-lead measure" data-reveal data-ember="calm">[À FOURNIR : chapeau de la page, 2 lignes]</p>
+    </div>
+  </section>
+
+  <!-- 2. Le fondateur -->
+  {
+    founder && (
+      <section class="section" aria-labelledby="founder-title" data-ember-intensity="0.6">
+        <div class="container founder">
+          <div class="founder__media" data-reveal>
+            <img src={founder.data.portrait} width="960" height="1200" alt="" loading="lazy" decoding="async" />
+          </div>
+          <div class="founder__body" data-ember="calm">
+            <p class="label" data-reveal>Le fondateur</p>
+            <h2 class="t-h2" id="founder-title" data-split>
+              {founder.data.name}
+            </h2>
+            <p class="t-muted" data-reveal>{founder.data.role}</p>
+            <p class="t-lead measure" data-reveal>{founder.data.bio}</p>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 3. L'équipe -->
+  <section class="section section--cool" aria-labelledby="team-title" data-ember-intensity="0.6">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="label label--cool" id="team-title" data-reveal>L'équipe</h2>
+      </div>
+      <ul class="team">
+        {
+          team.map((member) => (
+            <li class="team__member" data-reveal>
+              <img src={member.data.portrait} width="960" height="1200" alt="" loading="lazy" decoding="async" />
+              <h3 class="t-h3">{member.data.name}</h3>
+              <p class="t-small t-muted">{member.data.role}</p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 4. Valeurs -->
+  <section class="section" aria-labelledby="values-title" data-ember-intensity="0.6">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="label" id="values-title" data-reveal>Valeurs</h2>
+      </div>
+      <ul class="values">
+        {
+          values.map((value) => (
+            <li class="values__item" data-reveal>
+              <h3 class="t-h3">{value.title}</h3>
+              <p class="t-muted measure" data-ember="calm">
+                {value.text}
+              </p>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 5. Les bureaux -->
+  <section class="section section--cool" aria-labelledby="office-title" data-ember-intensity="0.6">
+    <div class="container office">
+      <div class="office__text">
+        <h2 class="label label--cool" id="office-title" data-reveal>Les bureaux</h2>
+        <p class="t-h2" data-split>{site.city}</p>
+        <address class="office__address t-muted" data-reveal data-ember="calm">{site.address}</address>
+      </div>
+      <img class="office__photo" src="/placeholders/agence-bureaux-16x9.svg" width="1600" height="900" alt="" loading="lazy" decoding="async" data-reveal />
+    </div>
+  </section>
+
+  <ContactCta />
+</BaseLayout>
+
+<style>
+  .founder {
+    display: grid;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .founder__media img,
+  .team__member img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  .founder__body {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+
+  .team {
+    display: grid;
+    gap: var(--space-6) var(--space-4);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .team__member {
+    display: grid;
+    gap: var(--space-1);
+    align-content: start;
+  }
+
+  .team__member h3 {
+    margin-top: var(--space-3);
+  }
+
+  .values {
+    display: grid;
+    gap: var(--space-6) var(--space-4);
+  }
+
+  .values__item {
+    display: grid;
+    gap: var(--space-2);
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+    align-content: start;
+  }
+
+  .office {
+    display: grid;
+    gap: var(--space-6);
+    align-items: center;
+  }
+
+  .office__text {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+
+  .office__address {
+    font-style: normal;
+  }
+
+  .office__photo {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+  }
+
+  @media (min-width: 900px) {
+    .founder {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-4);
+    }
+
+    .founder__media {
+      grid-column: 1 / span 5;
+    }
+
+    .founder__body {
+      grid-column: 7 / span 5;
+    }
+
+    .team {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .values {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .office {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-4);
+    }
+
+    .office__text {
+      grid-column: 1 / span 4;
+    }
+
+    .office__photo {
+      grid-column: 6 / span 7;
+    }
+  }
+</style>

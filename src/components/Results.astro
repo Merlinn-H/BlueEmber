@@ -1,0 +1,61 @@
+---
+// Key figures in Bodoni, gold. Placeholders stay as they are; a real number is counted up on entry.
+import { countable } from '../lib/placeholders';
+
+interface Props {
+  items: { value: string; label: string; period?: string }[];
+  /** Larger figures for the home page. */
+  size?: 'lg' | 'md';
+}
+const { items, size = 'lg' } = Astro.props;
+---
+
+<ul class:list={['results', `results--${size}`]}>
+  {
+    items.map((item) => (
+      <li class="results__item" data-reveal>
+        <p class="results__value" data-count={countable(item.value) !== null ? '' : undefined}>
+          {item.value}
+        </p>
+        <p class="results__label t-small t-muted">
+          {item.label}
+          {item.period ? ` ${item.period}` : ''}
+        </p>
+      </li>
+    ))
+  }
+</ul>
+
+<style>
+  .results {
+    display: grid;
+    gap: var(--space-6) var(--space-4);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  }
+
+  .results__item {
+    display: grid;
+    gap: var(--space-2);
+    align-content: start;
+  }
+
+  /* Chiffres cles : Bodoni, couleur or (5 % de la surface maximum) */
+  .results__value {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: var(--fs-h1);
+    line-height: var(--lh-h1);
+    color: var(--or);
+    font-variant-numeric: lining-nums tabular-nums;
+    overflow-wrap: anywhere;
+  }
+
+  .results--md .results__value {
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+  }
+
+  .results__label {
+    max-width: 28ch;
+  }
+</style>

@@ -1,0 +1,65 @@
+---
+// Pause control for an auto-scrolling band (WCAG 2.2.2: moving content that lasts more than 5 seconds must be
+// pausable). aria-pressed = paused. Wired in src/scripts/motion/marquee.ts to the band of the same section.
+interface Props {
+  label: string;
+}
+const { label } = Astro.props;
+---
+
+<button class="pause" type="button" aria-pressed="false" aria-label={label} data-marquee-pause>
+  <svg class="pause__icon pause__icon--pause" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+    <rect x="2" y="1.5" width="2.8" height="9" fill="currentColor"></rect>
+    <rect x="7.2" y="1.5" width="2.8" height="9" fill="currentColor"></rect>
+  </svg>
+  <svg class="pause__icon pause__icon--play" viewBox="0 0 12 12" width="12" height="12" aria-hidden="true" focusable="false">
+    <path d="M3 1.5l7 4.5-7 4.5z" fill="currentColor"></path>
+  </svg>
+  <span class="pause__text">Pause</span>
+</button>
+
+<style>
+  .pause {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 36px;
+    padding-inline: var(--space-4);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    font-size: var(--fs-label);
+    line-height: var(--lh-label);
+    font-weight: 600;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--ink-muted);
+    transition:
+      color var(--dur-fast) var(--ease-out-expo),
+      border-color var(--dur-fast) var(--ease-out-expo);
+  }
+
+  .pause:hover {
+    color: var(--ink);
+    border-color: var(--ink-muted);
+  }
+
+  .pause__icon--play,
+  .pause[aria-pressed='true'] .pause__icon--pause {
+    display: none;
+  }
+
+  .pause[aria-pressed='true'] .pause__icon--play {
+    display: block;
+  }
+
+  /* Only useful when the band actually moves */
+  :global(html:not(.js)) .pause {
+    display: none;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .pause {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,105 @@
+---
+import { ClientRouter } from 'astro:transitions';
+import '../styles/tokens.css';
+import '../styles/fonts.css';
+import '../styles/base.css';
+import Seo from '../components/Seo.astro';
+import Stage from '../components/Stage.astro';
+import Cursor from '../components/Cursor.astro';
+import Curtain from '../components/Curtain.astro';
+import Nav from '../components/Nav.astro';
+import Footer from '../components/Footer.astro';
+import { emberPages, type EmberPageKey } from '../config/ember';
+import { fragmentStyle } from '../lib/fragment';
+import { site } from '../config/site';
+
+interface Props {
+  title: string;
+  description: string;
+  /** Page type for the ember effect (intensity, brush radius, fragment placement). */
+  ember: EmberPageKey;
+  /** Key of the Open Graph image in /og. */
+  ogImage?: string;
+  ogType?: 'website' | 'article';
+  noindex?: boolean;
+  jsonLd?: Record<string, unknown>[];
+}
+
+const { title, description, ember, ogImage, ogType, noindex, jsonLd } = Astro.props;
+const config = emberPages[ember];
+---
+
+<!doctype html>
+<html lang={site.lang} transition:name="root" transition:animate="none" data-grain-jitter={site.grainJitter ? '' : undefined}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#0E0B0A" />
+    <meta name="color-scheme" content="dark" />
+    <Seo title={title} description={description} ogImage={ogImage} type={ogType} noindex={noindex} jsonLd={jsonLd} />
+
+    <link rel="icon" href="/brand/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/brand/favicon-32.png" sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href="/brand/apple-touch-icon.png" />
+
+    <!-- The two critical fonts, preloaded -->
+    <link rel="preload" href="/fonts/bodoni-moda-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/instrument-sans-latin-var.woff2" as="font" type="font/woff2" crossorigin />
+
+    <!-- Runs once at the first load, before the first paint: arms the curtain so the page is covered
+         while the entrance animations are prepared, and flags first visits for the preloader. -->
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        root.classList.add('js');
+        let first = false;
+        try {
+          first = !sessionStorage.getItem('be-seen');
+        } catch {
+          // storage unavailable: treat it as a repeat visit
+        }
+        root.setAttribute('data-preload', first ? 'first' : 'repeat');
+        // Failsafe: if the main script never starts, uncover the page.
+        setTimeout(() => {
+          if (!window.__beReady) root.removeAttribute('data-preload');
+        }, 4500);
+      })();
+    </script>
+
+    <ClientRouter />
+
+    <noscript>
+      <style>
+        .curtain {
+          display: none !important;
+        }
+      </style>
+    </noscript>
+
+    {
+      site.analytics.domain && (
+        <script is:inline defer data-domain={site.analytics.domain} src={site.analytics.src} />
+      )
+    }
+  </head>
+  <body
+    data-ember-page={ember}
+    data-ember-intensity={config.intensity}
+    data-ember-radius={config.radius}
+    style={fragmentStyle(ember)}
+  >
+    <a class="skip-link" href="#main">Aller au contenu</a>
+    <Stage />
+    <Cursor />
+    <Curtain />
+    <Nav />
+    <main id="main" tabindex="-1">
+      <slot />
+    </main>
+    <Footer />
+
+    <script>
+      import '../scripts/main';
+    </script>
+  </body>
+</html>

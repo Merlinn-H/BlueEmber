@@ -1,0 +1,38 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Marquee from './Marquee.astro';
+
+interface Props {
+  clients: CollectionEntry<'clients'>[];
+}
+const { clients } = Astro.props;
+---
+
+<Marquee class="clients-strip" label="Clients" speed={20} speedMobile={20}>
+  {
+    clients.map((client) => (
+      <li class="clients-strip__item">
+        <img src={client.data.logo} alt={client.data.name} width="160" height="48" loading="lazy" decoding="async" draggable="false" />
+      </li>
+    ))
+  }
+</Marquee>
+
+<style is:global>
+  .clients-strip .marquee__track {
+    gap: var(--space-7);
+    padding-right: var(--space-7);
+  }
+
+  .clients-strip__item {
+    flex: none;
+    width: 160px;
+    height: 48px;
+    opacity: 0.85;
+  }
+
+  .clients-strip__item img {
+    width: 160px;
+    height: 48px;
+  }
+</style>

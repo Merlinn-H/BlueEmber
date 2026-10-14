@@ -1,0 +1,113 @@
+/* Design tokens Blue Ember : valeurs du design system (brief sections 3 et 4). */
+
+:root {
+  /* Couleurs de base */
+  --charbon: #0e0b0a;
+  --cendre: #2a2421;
+  --titane-nuit: #1b2733;
+  --titane-profond: #2f4670;
+  --titane-chauffe: #4c78a8;
+  --titane-pale: #9db3c6;
+  --flamme: #f05a1c;
+  --or: #c9a96e;
+  --ivoire: #f6eee3;
+
+  /* Tokens de role : theme sombre par defaut */
+  --surface: var(--charbon);
+  --surface-raised: var(--cendre);
+  --surface-cool: var(--titane-nuit);
+  --ink: var(--ivoire);
+  --ink-muted: var(--titane-pale);
+  --accent: var(--flamme);
+  --accent-cool: var(--titane-chauffe);
+  --line: rgba(246, 238, 227, 0.14);
+  --focus: var(--titane-pale);
+
+  /* Surfaces derivees : sections alternees (85 %) et pied de page (90 %) */
+  --surface-cool-85: rgba(27, 39, 51, 0.85);
+  --surface-cool-90: rgba(27, 39, 51, 0.9);
+
+  /* Espacements */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 16px;
+  --space-4: 24px;
+  --space-5: 32px;
+  --space-6: 48px;
+  --space-7: 72px;
+  --space-8: 72px; /* 120px des 768px, voir media query plus bas */
+
+  /* Arrondis et ombres */
+  --radius-none: 0;
+  --radius-sm: 4px;
+  --radius-pill: 999px;
+  --shadow-lift: 0 24px 48px -24px rgba(0, 0, 0, 0.6);
+
+  /* Courbes et durees */
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --dur-fast: 200ms;
+  --dur-mid: 600ms;
+  --dur-slow: 900ms;
+
+  /* Grille : 12 colonnes, marge laterale space-3 mobile / space-6 desktop, contenu limite a 1440px */
+  --gutter: var(--space-3);
+  --max-w: 1440px;
+  --nav-h: 64px;
+
+  /* Polices */
+  --font-display: 'Bodoni Moda', 'Bodoni 72', Didot, 'Times New Roman', serif;
+  --font-body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+
+  /* Typographie : tailles interpolees entre 360px et 1440px de large (clamp) */
+  --fs-hero: clamp(56px, calc(56px + 64 * (100vw - 360px) / 1080), 120px);
+  --fs-h1: clamp(44px, calc(44px + 28 * (100vw - 360px) / 1080), 72px);
+  --fs-h2: clamp(34px, calc(34px + 14 * (100vw - 360px) / 1080), 48px);
+  --fs-h3: 28px;
+  --fs-logo: 26px;
+  --fs-lead: clamp(19px, calc(19px + 2 * (100vw - 360px) / 1080), 21px);
+  --fs-body: 17px;
+  --fs-small: 14px;
+  --fs-label: 12px;
+  --fs-button: 15px;
+  --fs-agency: 12px;
+
+  --lh-hero: 0.95;
+  --lh-h1: 1;
+  --lh-h2: 1.05;
+  --lh-h3: 1.15;
+  --lh-lead: 32px;
+  --lh-body: 28px;
+  --lh-small: 20px;
+  --lh-label: 16px;
+  --lh-button: 20px;
+
+  /* Empilement */
+  --z-stage: 0;
+  --z-content: 10;
+  --z-nav: 100;
+  --z-menu: 110;
+  --z-curtain: 9000;
+  --z-cursor: 9999;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --gutter: var(--space-6);
+    --space-8: 120px;
+    --nav-h: 88px;
+  }
+}
+
+/* Theme clair : defini, non utilise en V1 */
+[data-theme='light'] {
+  --surface: var(--ivoire);
+  --surface-raised: #ede3d5;
+  --surface-cool: #e3e8ee;
+  --ink: var(--charbon);
+  --ink-muted: var(--titane-profond);
+  --accent: var(--flamme);
+  --accent-cool: var(--titane-profond);
+  --line: rgba(14, 11, 10, 0.14);
+  --focus: var(--titane-profond);
+}

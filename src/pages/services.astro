@@ -1,0 +1,188 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import Approach from '../components/Approach.astro';
+import Faq from '../components/Faq.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { faq } from '../config/faq';
+import { faqPage } from '../lib/seo';
+import { site } from '../config/site';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const related = await Promise.all(
+  services.map(async (service) => (service.data.relatedProject ? await getEntry(service.data.relatedProject) : undefined)),
+);
+---
+
+<BaseLayout
+  title="Services · Stratégie, vidéo, réseaux sociaux et web · Blue Ember"
+  description="Une agence pour tout votre marketing : stratégie, films de marque, contenus réseaux et sites rapides. Découvrez notre méthode."
+  ember="services"
+  ogImage="services"
+  jsonLd={[faqPage(faq)]}
+>
+  <section class="page-hero" aria-labelledby="page-title" data-ember-intensity="0.6">
+    <div class="container page-hero__inner">
+      <p class="label label--cool" data-reveal>Services</p>
+      <h1 class="page-hero__title" id="page-title" data-split data-ember="soft">Ce que nous<br />faisons pour vous.</h1>
+      <p class="t-lead measure" data-reveal data-ember="calm">[À FOURNIR : chapeau de la page, 2 lignes]</p>
+    </div>
+  </section>
+
+  <div class="service-details">
+    {
+      services.map((service, index) => {
+        const project = related[index];
+        return (
+          <section class="section service-detail" id={service.id} aria-labelledby={`${service.id}-title`} data-ember-intensity="0.6">
+            <div class="container service-detail__inner">
+              <div class="service-detail__media" data-reveal>
+                <img src={service.data.image} width="960" height="1200" alt="" loading="lazy" decoding="async" />
+              </div>
+              <div class="service-detail__body" data-ember="calm">
+                <p class="label">{service.data.number}</p>
+                <h2 class="t-h2" id={`${service.id}-title`} data-split>
+                  {service.data.title}
+                </h2>
+                <div class="service-detail__block" data-reveal>
+                  <h3 class="label label--cool">Pour qui</h3>
+                  <p class="measure">{service.data.audience}</p>
+                </div>
+                <div class="service-detail__block" data-reveal>
+                  <h3 class="label label--cool">Ce que vous obtenez</h3>
+                  <ul class="service-detail__list">
+                    {service.data.deliverables.map((item) => <li>{item}</li>)}
+                  </ul>
+                </div>
+                {
+                  project && (
+                    <div class="service-detail__block" data-reveal>
+                      <h3 class="label label--cool">Projet lié</h3>
+                      <p>
+                        <Button href={`/realisations/${project.id}`} variant="link" arrow>
+                          {project.data.title} · {project.data.client}
+                        </Button>
+                      </p>
+                    </div>
+                  )
+                }
+                <div data-reveal>
+                  <Button href={site.cta.href} variant="outline">{site.cta.label}</Button>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      })
+    }
+  </div>
+
+  <Approach tone="cool" id="method" />
+
+  <section class="section" aria-labelledby="faq-title" data-ember-intensity="0.6">
+    <div class="container faq-layout">
+      <div class="section-head">
+        <p class="label" data-reveal>FAQ</p>
+        <h2 class="t-h2" id="faq-title" data-split>Questions fréquentes</h2>
+      </div>
+      <Faq items={faq} />
+    </div>
+  </section>
+
+  <ContactCta />
+</BaseLayout>
+
+<style>
+  .service-detail__inner {
+    display: grid;
+    gap: var(--space-6);
+    align-items: start;
+  }
+
+  .service-detail__media img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  .service-detail__body {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+    align-content: start;
+  }
+
+  .service-detail__block {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .service-detail__list {
+    display: grid;
+    gap: var(--space-2);
+  }
+
+  .service-detail__list li {
+    position: relative;
+    padding-left: var(--space-4);
+  }
+
+  .service-detail__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.7em;
+    width: 8px;
+    height: 1px;
+    background: var(--or);
+  }
+
+  @media (min-width: 900px) {
+    .service-detail__inner {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-4);
+      align-items: center;
+    }
+
+    .service-detail__media {
+      grid-column: 1 / span 5;
+    }
+
+    .service-detail__body {
+      grid-column: 7 / span 6;
+    }
+
+    /* Alternation: image left then right */
+    .service-detail:nth-child(even) .service-detail__media {
+      grid-column: 8 / span 5;
+      grid-row: 1;
+    }
+
+    .service-detail:nth-child(even) .service-detail__body {
+      grid-column: 1 / span 6;
+      grid-row: 1;
+    }
+  }
+
+  .faq-layout {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  @media (min-width: 900px) {
+    .faq-layout {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-4);
+    }
+
+    .faq-layout > :first-child {
+      grid-column: 1 / span 4;
+    }
+
+    .faq-layout > :last-child {
+      grid-column: 6 / span 7;
+    }
+  }
+</style>

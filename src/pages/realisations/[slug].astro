@@ -1,0 +1,408 @@
+---
+import { getCollection, getEntries, getEntry } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Video from '../../components/Video.astro';
+import Results from '../../components/Results.astro';
+import Testimonial from '../../components/Testimonial.astro';
+import ContactCta from '../../components/ContactCta.astro';
+import { emberPages } from '../../config/ember';
+import { breadcrumb, creativeWork } from '../../lib/seo';
+
+export async function getStaticPaths() {
+  const projects = (await getCollection('projets')).sort((a, b) => a.data.order - b.data.order);
+  return projects.map((project, index) => ({
+    params: { slug: project.id },
+    props: { project, next: projects[(index + 1) % projects.length] },
+  }));
+}
+
+interface Props {
+  project: CollectionEntry<'projets'>;
+  next: CollectionEntry<'projets'>;
+}
+
+const { project, next } = Astro.props;
+const { title, client, year, sector, summary, hero, video, context, challenge, solution, solutionImages, results, gallery, credits } =
+  project.data;
+const testimonial = project.data.testimonial ? await getEntry(project.data.testimonial) : undefined;
+const services = await getEntries(project.data.services);
+
+const origin = Astro.site!.origin;
+const url = `${origin}/realisations/${project.id}`;
+const bodyIntensity = emberPages.projet.intensity;
+
+const texts = [
+  { id: 'context', label: 'Contexte', text: context },
+  { id: 'challenge', label: 'Le défi', text: challenge },
+];
+---
+
+<BaseLayout
+  title={`${title} pour ${client} · Étude de cas · Blue Ember`}
+  description={`${summary} Contexte, solution et résultats du projet.`}
+  ember="projet"
+  ogImage="projet"
+  ogType="article"
+  jsonLd={[
+    breadcrumb([
+      { name: 'Accueil', url: origin },
+      { name: 'Réalisations', url: `${origin}/realisations` },
+      { name: title, url },
+    ]),
+    creativeWork({ name: title, description: summary, url, image: `${origin}${hero}`, client, year }),
+  ]}
+>
+  <!-- 1. Hero plein écran + fiche -->
+  <section class="project-hero" aria-labelledby="page-title" data-ember-intensity={emberPages.projet.heroIntensity}>
+    <div class="project-hero__media" aria-hidden="true">
+      {
+        video ? (
+          <Video src={video.src} poster={video.poster ?? hero} mobileSrc={video.mobileSrc} />
+        ) : (
+          <img src={hero} width="1600" height="900" alt="" fetchpriority="high" decoding="async" />
+        )
+      }
+    </div>
+    <div class="container project-hero__inner">
+      <nav class="breadcrumb t-small" aria-label="Fil d'Ariane">
+        <ol>
+          <li><a href="/realisations">Réalisations</a></li>
+          <li aria-current="page">{title}</li>
+        </ol>
+      </nav>
+      <p class="label label--cool" data-reveal>Étude de cas</p>
+      <h1 class="project-hero__title" id="page-title" data-split data-ember="soft">{title}</h1>
+      <dl class="project-meta" data-reveal data-ember="calm">
+        <div>
+          <dt class="label label--cool">Client</dt>
+          <dd>{client}</dd>
+        </div>
+        <div>
+          <dt class="label label--cool">Année</dt>
+          <dd>{year}</dd>
+        </div>
+        <div>
+          <dt class="label label--cool">Secteur</dt>
+          <dd>{sector}</dd>
+        </div>
+        <div>
+          <dt class="label label--cool">Services</dt>
+          <dd>{services.map((service) => service.data.title).join(', ')}</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- 2, 3. Contexte et défi -->
+  {
+    texts.map((block) => (
+      <section class="section project-text" aria-labelledby={`${block.id}-title`} data-ember-intensity={bodyIntensity}>
+        <div class="container project-text__inner">
+          <h2 class="label" id={`${block.id}-title`} data-reveal>
+            {block.label}
+          </h2>
+          <p class="t-lead measure" data-reveal data-ember="calm">
+            {block.text}
+          </p>
+        </div>
+      </section>
+    ))
+  }
+
+  <!-- 4. Solution + 2 images -->
+  <section class="section project-text" aria-labelledby="solution-title" data-ember-intensity={bodyIntensity}>
+    <div class="container project-text__inner">
+      <h2 class="label" id="solution-title" data-reveal>La solution</h2>
+      <div class="project-solution">
+        <p class="t-lead measure" data-reveal data-ember="calm">{solution}</p>
+        {
+          solutionImages.length > 0 && (
+            <div class="project-solution__images">
+              {solutionImages.map((src) => (
+                <img src={src} width="960" height="1200" alt="" loading="lazy" decoding="async" data-reveal />
+              ))}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 5. Résultats -->
+  <section class="section section--cool" aria-labelledby="results-title" data-ember-intensity={bodyIntensity}>
+    <div class="container">
+      <div class="section-head">
+        <h2 class="label label--cool" id="results-title" data-reveal>Résultats</h2>
+      </div>
+      <Results items={results} size="lg" />
+    </div>
+  </section>
+
+  <!-- 6. Témoignage client -->
+  {
+    testimonial && (
+      <section class="section" aria-label="Témoignage client" data-ember-intensity={bodyIntensity}>
+        <div class="container">
+          <Testimonial testimonial={testimonial} />
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 7. Galerie pleine largeur : 16:9 et 4:5 en alternance -->
+  {
+    gallery.length > 0 && (
+      <section class="section section--flush-top" aria-label="Galerie" data-ember-intensity={bodyIntensity}>
+        <div class="gallery">
+          {gallery.map((item) => (
+            <img
+              class:list={['gallery__item', `gallery__item--${item.ratio}`]}
+              src={item.src}
+              width={item.ratio === '16x9' ? 1600 : 960}
+              height={item.ratio === '16x9' ? 900 : 1200}
+              alt=""
+              loading="lazy"
+              decoding="async"
+              data-reveal
+            />
+          ))}
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 8. Crédits (optionnel) -->
+  {
+    credits.length > 0 && (
+      <section class="section section--flush-top" aria-labelledby="credits-title" data-ember-intensity={bodyIntensity}>
+        <div class="container">
+          <h2 class="label label--cool" id="credits-title" data-reveal>Crédits</h2>
+          <dl class="credits" data-ember="calm" data-reveal>
+            {credits.map((credit) => (
+              <div>
+                <dt class="t-small t-muted">{credit.role}</dt>
+                <dd>{credit.name}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+      </section>
+    )
+  }
+
+  <ContactCta />
+
+  <!-- 9. Projet suivant -->
+  <section class="next-project" aria-labelledby="next-title" data-ember-intensity={bodyIntensity}>
+    <a class="next-project__link" href={`/realisations/${next.id}`} data-cursor="view">
+      <div class="next-project__media" aria-hidden="true">
+        <img src={next.data.hero} width="1600" height="900" alt="" loading="lazy" decoding="async" />
+      </div>
+      <div class="container next-project__inner">
+        <p class="label label--cool" id="next-title">Projet suivant</p>
+        <h2 class="t-h1 next-project__title">{next.data.title}</h2>
+        <p class="t-small t-muted">{next.data.client} · {next.data.year}</p>
+      </div>
+    </a>
+  </section>
+</BaseLayout>
+
+<style>
+  .project-hero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 100svh;
+    padding-top: calc(var(--nav-h) + var(--space-6));
+    padding-bottom: var(--space-7);
+  }
+
+  /* Full-screen image or video. Slightly translucent so the ember stays faintly visible (intensity 0.4). */
+  .project-hero__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: var(--hero-media-opacity, 0.88);
+  }
+
+  .project-hero__media :global(img),
+  .project-hero__media :global(video) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .project-hero__media::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(14, 11, 10, 0.94) 0%, rgba(14, 11, 10, 0.45) 42%, rgba(14, 11, 10, 0) 72%);
+  }
+
+  .project-hero__inner {
+    display: grid;
+    gap: var(--space-4);
+    justify-items: start;
+  }
+
+  .project-hero__title {
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  .breadcrumb ol {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    color: var(--ink-muted);
+  }
+
+  .breadcrumb li + li::before {
+    content: '/';
+    margin-right: var(--space-2);
+    color: var(--line);
+  }
+
+  .breadcrumb a:hover {
+    color: var(--ink);
+  }
+
+  .project-meta {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-4) var(--space-6);
+    margin: var(--space-4) 0 0;
+    padding-top: var(--space-4);
+    border-top: 1px solid var(--line);
+    width: min(100%, 760px);
+  }
+
+  .project-meta dd {
+    margin: var(--space-1) 0 0;
+  }
+
+  @media (min-width: 768px) {
+    .project-meta {
+      grid-template-columns: repeat(4, minmax(0, auto));
+      justify-content: start;
+    }
+  }
+
+  .project-text__inner {
+    display: grid;
+    gap: var(--space-4);
+  }
+
+  .project-solution {
+    display: grid;
+    gap: var(--space-6);
+  }
+
+  .project-solution__images {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .project-solution__images img {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    object-fit: cover;
+  }
+
+  @media (min-width: 900px) {
+    .project-text__inner {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-4);
+    }
+
+    .project-text__inner > :first-child {
+      grid-column: 1 / span 3;
+    }
+
+    .project-text__inner > :last-child {
+      grid-column: 4 / span 7;
+    }
+  }
+
+  .gallery {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .gallery__item {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+  }
+
+  .gallery__item--16x9 {
+    aspect-ratio: 16 / 9;
+  }
+
+  .gallery__item--4x5 {
+    aspect-ratio: 4 / 5;
+    width: min(560px, calc(100% - var(--gutter) * 2));
+    margin-inline: var(--gutter) auto;
+  }
+
+  /* 4:5 images alternate sides: first on the left, second on the right */
+  .gallery__item--4x5:nth-of-type(4n) {
+    margin-inline: auto var(--gutter);
+  }
+
+  .credits {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: var(--space-4);
+    margin: var(--space-4) 0 0;
+  }
+
+  .credits dd {
+    margin: 0;
+  }
+
+  .next-project {
+    position: relative;
+  }
+
+  .next-project__link {
+    position: relative;
+    display: block;
+    padding-block: var(--space-8);
+    overflow: hidden;
+  }
+
+  .next-project__media {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.42;
+    transition: opacity var(--dur-mid) var(--ease-out-expo);
+  }
+
+  .next-project__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--dur-slow) var(--ease-out-expo);
+  }
+
+  .next-project__inner {
+    display: grid;
+    gap: var(--space-3);
+    justify-items: start;
+  }
+
+  @media (hover: hover) {
+    .next-project__link:hover .next-project__media {
+      opacity: 0.6;
+    }
+
+    .next-project__link:hover img {
+      transform: scale(1.04);
+    }
+  }
+</style>

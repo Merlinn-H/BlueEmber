@@ -1,0 +1,58 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { site } from '../config/site';
+import { mailto } from '../lib/placeholders';
+
+const { legal } = site;
+---
+
+<LegalLayout
+  title="Mentions légales · Blue Ember"
+  description="Informations légales sur l'éditeur et l'hébergeur du site Blue Ember."
+  heading="Mentions légales"
+  ogImage="mentions-legales"
+>
+  <section aria-labelledby="editor">
+    <h2 id="editor">Éditeur du site</h2>
+    <dl>
+      <dt>Raison sociale</dt>
+      <dd>{legal.companyName}</dd>
+      <dt>Forme juridique</dt>
+      <dd>{legal.legalForm}</dd>
+      <dt>Capital</dt>
+      <dd>{legal.capital}</dd>
+      <dt>SIREN</dt>
+      <dd>{legal.siren}</dd>
+      <dt>Adresse</dt>
+      <dd>{legal.address}</dd>
+      <dt>Directeur de la publication</dt>
+      <dd>{legal.publicationDirector}</dd>
+      <dt>Contact</dt>
+      <dd><a href={mailto(site.email)}>{site.email}</a></dd>
+    </dl>
+  </section>
+
+  <section aria-labelledby="host">
+    <h2 id="host">Hébergeur</h2>
+    <dl>
+      <dt>Société</dt>
+      <dd>{legal.host}</dd>
+    </dl>
+  </section>
+
+  <section aria-labelledby="ip">
+    <h2 id="ip">Propriété intellectuelle</h2>
+    <p>[À FOURNIR : clause de propriété intellectuelle (textes, images, vidéos, marques), 80 à 120 mots]</p>
+  </section>
+
+  <section aria-labelledby="data">
+    <h2 id="data">Données personnelles</h2>
+    <p>[À FOURNIR : finalités des traitements, 60 à 100 mots]</p>
+    <p>[À FOURNIR : durée de conservation des données, 40 à 80 mots]</p>
+    <p>
+      Vous disposez d'un droit d'accès, de rectification, d'effacement, d'opposition et de portabilité. Pour l'exercer :
+      <a href={mailto(legal.dpoEmail)}>{legal.dpoEmail}</a>. Plus de détails dans la
+      <a href="/confidentialite">politique de confidentialité</a>.
+    </p>
+  </section>
+</LegalLayout>

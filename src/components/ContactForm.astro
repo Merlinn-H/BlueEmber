@@ -1,0 +1,101 @@
+---
+import Field from './Field.astro';
+import Button from './Button.astro';
+import { site } from '../config/site';
+
+const budgets = [
+  { value: 'lt-5k', label: '[< 5 k€]' },
+  { value: '5-15k', label: '[5 à 15 k€]' },
+  { value: '15-40k', label: '[15 à 40 k€]' },
+  { value: 'gt-40k', label: '[> 40 k€]' },
+  { value: 'unknown', label: 'Je ne sais pas encore' },
+];
+---
+
+<div class="contact-form" data-form-shell data-ember="calm" data-ember-calm="1">
+  <form
+    data-form="contact"
+    data-endpoint={site.formEndpoint}
+    data-delay={site.responseDelay}
+    data-email={site.email}
+    data-astro-reload
+    method="post"
+    novalidate
+    aria-label="Formulaire de contact"
+  >
+    <div class="contact-form__grid">
+      <Field name="name" label="Nom" required autocomplete="name" requiredMessage="Indiquez votre nom." />
+      <Field name="company" label="Entreprise" required autocomplete="organization" requiredMessage="Indiquez le nom de votre entreprise." />
+      <Field
+        name="email"
+        label="E-mail"
+        type="email"
+        required
+        autocomplete="email"
+        requiredMessage="Indiquez votre adresse e-mail."
+        invalidMessage="Cette adresse e-mail semble incorrecte."
+      />
+      <Field name="phone" label="Téléphone" type="tel" autocomplete="tel" invalidMessage="Ce numéro de téléphone semble incorrect." />
+    </div>
+
+    <Field name="budget" as="select" label="Budget" required options={budgets} requiredMessage="Choisissez une fourchette de budget." />
+    <Field name="message" as="textarea" label="Message" required requiredMessage="Décrivez votre projet en quelques lignes." />
+
+    <div class="field" data-field data-required-message="Pour envoyer le formulaire, acceptez le traitement de vos données.">
+      <label class="check" for="f-consent">
+        <input type="checkbox" id="f-consent" name="consent" required aria-describedby="f-consent-error" />
+        <span>[À FOURNIR : texte du consentement RGPD]</span>
+      </label>
+      <p class="field__error t-small" id="f-consent-error" data-error></p>
+    </div>
+
+    <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />
+
+    <div class="contact-form__submit">
+      <Button type="submit">Envoyer</Button>
+      <p class="form-status" role="status" aria-live="polite" data-status></p>
+    </div>
+  </form>
+
+  <!-- Replaces the form after a successful send; the live region announces it. -->
+  <div class="form-success" data-success role="status" aria-live="polite" tabindex="-1"></div>
+</div>
+
+<style>
+  .contact-form form {
+    display: grid;
+    gap: var(--space-5);
+  }
+
+  .contact-form__grid {
+    display: grid;
+    gap: var(--space-5) var(--space-4);
+  }
+
+  .contact-form__submit {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-4);
+  }
+
+  @media (min-width: 640px) {
+    .contact-form__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .form-success:empty {
+    display: none;
+  }
+
+  .form-success {
+    display: grid;
+    gap: var(--space-3);
+    padding: var(--space-6) 0;
+  }
+
+  .form-success:focus {
+    outline: none;
+  }
+</style>

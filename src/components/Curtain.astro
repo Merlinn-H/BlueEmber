@@ -1,0 +1,116 @@
+---
+// Preloader and page-transition curtain. It persists across navigations (transition:persist),
+// so it can stay closed while the new page is swapped in underneath.
+import Logo from './Logo.astro';
+---
+
+<div class="curtain" data-curtain transition:persist="curtain" aria-hidden="true">
+  <div class="curtain__panel" data-curtain-panel>
+    <div class="curtain__edge"></div>
+    <div class="curtain__logo" data-curtain-logo>
+      <Logo variant="dark" size={44} halo />
+    </div>
+  </div>
+</div>
+
+<style is:global>
+  .curtain {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-curtain);
+    visibility: hidden;
+    pointer-events: none;
+    overflow: hidden;
+  }
+
+  .curtain__panel {
+    position: absolute;
+    inset: 0;
+    background: var(--charbon);
+    transform: translate3d(0, 100%, 0);
+    will-change: transform;
+  }
+
+  /* Liseré incandescent sur le bord superieur : titane-chauffe vers titane-pale, 2px, leger flou */
+  .curtain__edge {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -2px;
+    height: 2px;
+    background: linear-gradient(90deg, var(--titane-chauffe), var(--titane-pale));
+    filter: blur(0.6px);
+    box-shadow: 0 0 14px 2px rgba(76, 120, 168, 0.55);
+  }
+
+  .curtain__logo {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    opacity: 0;
+  }
+
+  /* First paint: the curtain already covers the page (set by the inline script in <head>),
+     so the content is never seen before its entrance animation is armed. */
+  html[data-preload] .curtain {
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  html[data-preload] .curtain__panel {
+    transform: none;
+  }
+
+  html[data-preload='first'] .curtain__logo {
+    opacity: 1;
+  }
+
+  /* The dot breathes like an ember: opacity and a soft halo */
+  .curtain .logo__dot {
+    animation: ember-dot 1.5s ease-in-out infinite;
+  }
+
+  .curtain .logo__halo {
+    animation: ember-halo 1.5s ease-in-out infinite;
+  }
+
+  @keyframes ember-dot {
+    0%,
+    100% {
+      opacity: 0.55;
+    }
+    50% {
+      opacity: 1;
+    }
+  }
+
+  @keyframes ember-halo {
+    0%,
+    100% {
+      opacity: 0;
+      transform: scale(0.7);
+    }
+    50% {
+      opacity: 0.9;
+      transform: scale(1.35);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .curtain .logo__dot,
+    .curtain .logo__halo {
+      animation: none;
+    }
+
+    .curtain .logo__halo {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .curtain__panel {
+      will-change: transform;
+    }
+  }
+</style>

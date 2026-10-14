@@ -1,0 +1,64 @@
+---
+// Custom cursor (desktop with a fine pointer only, never under prefers-reduced-motion).
+// The wrapper uses display: contents so the dot stays in the root stacking context, which
+// mix-blend-mode: difference needs to blend with the page.
+---
+
+<div class="cursor" data-cursor-root transition:persist="cursor" aria-hidden="true">
+  <span class="cursor__dot" data-cursor-dot></span>
+  <span class="cursor__view" data-cursor-view>Voir</span>
+</div>
+
+<style is:global>
+  .cursor {
+    display: contents;
+  }
+
+  /* Disque ivoire de 10px (40px scale 0.25), mix-blend-mode difference */
+  .cursor__dot {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 40px;
+    height: 40px;
+    margin: -20px 0 0 -20px;
+    border-radius: 50%;
+    background: var(--ivoire);
+    mix-blend-mode: difference;
+    pointer-events: none;
+    z-index: var(--z-cursor);
+    opacity: 0;
+    transform: translate3d(-100px, -100px, 0) scale(0.25);
+    will-change: transform, opacity;
+  }
+
+  /* Pastille flamme de 88px avec "Voir" sur un projet */
+  .cursor__view {
+    position: fixed;
+    left: 0;
+    top: 0;
+    width: 88px;
+    height: 88px;
+    margin: -44px 0 0 -44px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--flamme);
+    color: var(--charbon);
+    font-family: var(--font-body);
+    font-size: var(--fs-button);
+    line-height: var(--lh-button);
+    font-weight: 600;
+    pointer-events: none;
+    z-index: var(--z-cursor);
+    opacity: 0;
+    transform: translate3d(-100px, -100px, 0) scale(0);
+    will-change: transform, opacity;
+  }
+
+  @media (hover: none), (pointer: coarse), (prefers-reduced-motion: reduce) {
+    .cursor {
+      display: none;
+    }
+  }
+</style>

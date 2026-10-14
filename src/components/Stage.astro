@@ -1,0 +1,146 @@
+---
+// Fixed scene behind the whole site: Ambiance (z0), WebGL canvas (z1), fragment (z2), then the content.
+// The element persists across page navigations (transition:persist), so the canvas is never recreated.
+// The grain is the ::after of .ambiance, as in the design system (6.1).
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
+const has = (file: string) => existsSync(join(process.cwd(), 'public', file));
+const finalFragment = has('scene/fragment-flamme.webp');
+// The final Blender render takes over automatically as soon as the WebP exists.
+const fragmentSrc = finalFragment ? '/scene/fragment-flamme.webp' : '/scene/fragment-flamme.svg';
+const maskSrc = finalFragment ? '/scene/fragment-flamme.webp' : '/scene/fragment-flamme-alpha.svg';
+const cracksSrc = has('textures/ember-cracks.webp') ? '/textures/ember-cracks.webp' : undefined;
+---
+
+<div class="stage" data-stage data-cracks={cracksSrc} transition:persist="stage" aria-hidden="true">
+  <div class="ambiance">
+    <div class="ambiance__glow ambiance__glow--cool" data-glow="cool"></div>
+    <div class="ambiance__glow ambiance__glow--warm" data-glow="warm"></div>
+  </div>
+  <canvas class="ember-canvas" data-ember-canvas></canvas>
+  <img class="fragment" data-fragment src={fragmentSrc} data-mask={maskSrc} alt="" width="600" height="800" decoding="async" />
+</div>
+
+<style is:global>
+  .stage {
+    position: fixed;
+    inset: 0;
+    z-index: var(--z-stage);
+    overflow: hidden;
+    pointer-events: none;
+    /* Container units (cqw/cqh) keep the fragment maths independent of the scrollbar width */
+    container-type: size;
+  }
+
+  /* Fond Ambiance : charbon + deux lueurs (titane haut gauche, flamme bas droite) + grain.
+     Les lueurs sont deux calques separes pour pouvoir bouger de 20px au maximum (transform). */
+  .ambiance {
+    position: absolute;
+    inset: 0;
+    background: var(--charbon);
+  }
+
+  .ambiance::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    background-image: url('/textures/grain.svg');
+    opacity: 0.45;
+    mix-blend-mode: overlay;
+  }
+
+  .ambiance__glow {
+    position: absolute;
+    inset: -24px;
+    will-change: transform;
+  }
+
+  .ambiance__glow--cool {
+    background: radial-gradient(
+      ellipse 70% 80% at 24px 24px,
+      rgba(76, 120, 168, 0.95) 0%,
+      rgba(47, 70, 112, 0.7) 30%,
+      rgba(27, 39, 51, 0.3) 55%,
+      rgba(27, 39, 51, 0) 72%
+    );
+  }
+
+  .ambiance__glow--warm {
+    background: radial-gradient(
+      ellipse 70% 80% at calc(100% - 24px) calc(100% - 24px),
+      rgba(240, 90, 28, 0.95) 0%,
+      rgba(214, 78, 30, 0.6) 30%,
+      rgba(110, 35, 15, 0.25) 55%,
+      rgba(110, 35, 15, 0) 72%
+    );
+  }
+
+  /* Optional film jitter (html[data-grain-jitter]): a few pixels every 120ms, transform only */
+  html[data-grain-jitter] .ambiance::after {
+    inset: -8px;
+    animation: grain-jitter 120ms steps(1) infinite;
+  }
+
+  @keyframes grain-jitter {
+    0% {
+      transform: translate3d(0, 0, 0);
+    }
+    25% {
+      transform: translate3d(-4px, 3px, 0);
+    }
+    50% {
+      transform: translate3d(3px, -4px, 0);
+    }
+    75% {
+      transform: translate3d(-2px, -3px, 0);
+    }
+  }
+
+  .ember-canvas {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+
+  /* Fragment : toujours le meme objet, seuls position et taille changent selon la page.
+     Largeur de base 30cqw, mise a l'echelle par --fs ; position par --fx / --fy (definis sur <body>). */
+  .fragment {
+    --fx: var(--fx-d, -8cqw);
+    --fy: var(--fy-d, 70cqh);
+    --fs: var(--fs-d, 0.867);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 30cqw;
+    height: auto;
+    transform-origin: 0 0;
+    transform: translate3d(var(--fx), var(--fy), 0) scale(var(--fs));
+    filter: brightness(var(--fragment-light, 1));
+    transition: filter var(--dur-mid) var(--ease-out-expo);
+    pointer-events: none;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  @media (max-width: 767px) {
+    .fragment {
+      --fx: var(--fx-m, -10cqw);
+      --fy: var(--fy-m, 70cqh);
+      --fs: var(--fs-m, 1.333);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .ambiance__glow {
+      will-change: auto;
+    }
+
+    html[data-grain-jitter] .ambiance::after {
+      animation: none;
+    }
+  }
+</style>

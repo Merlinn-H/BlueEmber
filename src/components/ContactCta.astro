@@ -1,0 +1,40 @@
+---
+// "Bloc contact final": big title, primary button, e-mail link. Used on every page.
+import Button from './Button.astro';
+import { site } from '../config/site';
+import { mailto } from '../lib/placeholders';
+
+interface Props {
+  id?: string;
+}
+const { id = 'contact-cta' } = Astro.props;
+---
+
+<section class="contact-cta section" aria-labelledby={`${id}-title`} data-ember-intensity="1">
+  <div class="container contact-cta__inner">
+    <h2 class="t-h1 contact-cta__title" id={`${id}-title`} data-split data-ember="soft">Parlons de<br />votre projet.</h2>
+    <div class="contact-cta__actions" data-reveal>
+      <Button href={site.cta.href}>{site.cta.label}</Button>
+      <Button href={mailto(site.email)} variant="link">{site.email}</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .contact-cta__inner {
+    display: grid;
+    gap: var(--space-6);
+    justify-items: start;
+  }
+
+  .contact-cta__title {
+    width: fit-content;
+  }
+
+  .contact-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-5);
+  }
+</style>

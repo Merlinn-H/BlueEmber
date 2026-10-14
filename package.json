@@ -1,0 +1,47 @@
+{
+  "name": "blue-ember",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Site de l'agence Blue Ember : marketing, video et tech.",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "postbuild": "node scripts/check-placeholders.mjs --warn",
+    "preview": "astro preview",
+    "check": "astro check",
+    "lint": "eslint .",
+    "brand:generate": "node scripts/generate-brand.mjs",
+    "placeholders:generate": "node scripts/generate-placeholders.mjs",
+    "placeholders:check": "node scripts/check-placeholders.mjs",
+    "contrast:check": "node scripts/check-contrast.mjs",
+    "seo:check": "node scripts/check-seo.mjs",
+    "fonts:copy": "node scripts/copy-fonts.mjs"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.8",
+    "gsap": "^3.15.0",
+    "lenis": "^1.3.26",
+    "lil-gui": "^0.21.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@eslint/js": "^10.0.1",
+    "@fontsource-variable/bodoni-moda": "^5.3.0",
+    "@fontsource-variable/instrument-sans": "^5.3.0",
+    "@fontsource/bodoni-moda": "^5.3.0",
+    "@fontsource/instrument-sans": "^5.3.0",
+    "eslint": "^10.12.0",
+    "eslint-plugin-astro": "^3.2.1",
+    "globals": "^17.13.0",
+    "lighthouse": "^13.5.0",
+    "opentype.js": "^2.0.0",
+    "sharp": "^0.35.5",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.71.2"
+  }
+}

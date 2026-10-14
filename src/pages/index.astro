@@ -1,0 +1,261 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import Icon from '../components/Icon.astro';
+import Video from '../components/Video.astro';
+import PauseButton from '../components/PauseButton.astro';
+import ProjectStrip from '../components/ProjectStrip.astro';
+import ServiceCard from '../components/ServiceCard.astro';
+import Results from '../components/Results.astro';
+import Approach from '../components/Approach.astro';
+import ClientsStrip from '../components/ClientsStrip.astro';
+import Testimonial from '../components/Testimonial.astro';
+import ContactCta from '../components/ContactCta.astro';
+import { site } from '../config/site';
+import { professionalService } from '../lib/seo';
+
+const byOrder = <T extends { data: { order: number } }>(a: T, b: T) => a.data.order - b.data.order;
+const projects = (await getCollection('projets')).sort(byOrder);
+const services = (await getCollection('services')).sort(byOrder);
+const clients = (await getCollection('clients')).sort(byOrder);
+const testimonial = (await getCollection('temoignages')).sort(byOrder)[0];
+
+const results = [
+  { value: '[CHIFFRE-1]', label: 'projets livrés' },
+  { value: '[CHIFFRE-2]', label: "ans d'expérience cumulée" },
+  { value: '[CHIFFRE-3]', label: 'de croissance moyenne de [INDICATEUR]' },
+];
+---
+
+<BaseLayout
+  title={`Blue Ember · Agence marketing, vidéo et tech à ${site.city}`}
+  description="Stratégie, production vidéo, réseaux sociaux et sites web pour les PME et les grandes entreprises. Prenez rendez-vous avec Blue Ember."
+  ember="home"
+  ogImage="accueil"
+  jsonLd={[professionalService(Astro.site!.origin)]}
+>
+  <!-- 1. Hero -->
+  <section class="hero" aria-labelledby="hero-title" data-ember-intensity="1" data-ember-hero>
+    {
+      site.heroVideo.enabled && (
+        <div class="hero__video">
+          <Video src={site.heroVideo.src} poster={site.heroVideo.poster} mobileSrc={site.heroVideo.mobileSrc || undefined} />
+        </div>
+      )
+    }
+    <div class="container hero__inner">
+      <div class="hero__content">
+        <p class="label label--cool" data-reveal>Marketing · Vidéo · Tech</p>
+        <h1 class="t-hero hero__title" id="hero-title" data-split data-reveal-delay="0.12" data-ember="soft">
+          Votre marque<br />mérite<br />de briller.
+        </h1>
+        <p class="t-lead hero__lead measure" data-reveal data-reveal-delay="0.4" data-ember="calm">
+          Marketing, vidéo et tech pour les entreprises ambitieuses.
+        </p>
+        <div data-reveal data-reveal-delay="0.55">
+          <Button href={site.cta.href}>{site.cta.label}</Button>
+        </div>
+      </div>
+      <a class="hero__cue" href="#manifeste" data-reveal data-reveal-delay="0.9">
+        <span>Défiler</span>
+        <Icon name="arrow-down" class="hero__cue-arrow" />
+      </a>
+    </div>
+  </section>
+
+  <!-- 2. Manifeste -->
+  <section class="section manifesto" id="manifeste" aria-label="Manifeste" data-ember-intensity="1">
+    <div class="container">
+      <h2 class="manifesto__text" data-split data-ember="soft">
+        Nous allumons<br />les marques<br />qui veulent<br />compter.
+      </h2>
+    </div>
+  </section>
+
+  <!-- 3. Réalisations : bande en défilement automatique -->
+  <section class="section section--flush-top showcase" aria-labelledby="showcase-title" data-ember-intensity="1">
+    <div class="container section-head section-head--split">
+      <h2 class="label" id="showcase-title" data-reveal>Réalisations</h2>
+      <PauseButton label="Pause du défilement des réalisations" />
+    </div>
+    <ProjectStrip projects={projects} />
+    <div class="container showcase__cta" data-reveal>
+      <Button href="/realisations" variant="outline">Voir toutes les réalisations</Button>
+    </div>
+  </section>
+
+  <!-- 4. Résultats -->
+  <section class="section section--cool" aria-labelledby="results-title" data-ember-intensity="0.6">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="label label--cool" id="results-title" data-reveal>Résultats</h2>
+      </div>
+      <Results items={results} />
+    </div>
+  </section>
+
+  <!-- 5. Services -->
+  <section class="section" aria-labelledby="services-title" data-ember-intensity="0.6">
+    <div class="container">
+      <div class="section-head">
+        <h2 class="label" id="services-title" data-reveal>Services</h2>
+      </div>
+      <ul class="service-grid">
+        {
+          services.map((service) => (
+            <li data-reveal>
+              <ServiceCard service={service} />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- 6. Approche -->
+  <Approach tone="cool" />
+
+  <!-- 7. Clients -->
+  <section class="section clients" aria-labelledby="clients-title" data-ember-intensity="0.6">
+    <div class="container section-head section-head--split">
+      <h2 class="label label--cool" id="clients-title" data-reveal>Ils nous font confiance</h2>
+      <PauseButton label="Pause du défilement des logos clients" />
+    </div>
+    <ClientsStrip clients={clients} />
+  </section>
+
+  <!-- 8. Témoignage -->
+  {
+    testimonial && (
+      <section class="section section--cool" aria-label="Témoignage client" data-ember-intensity="0.6">
+        <div class="container">
+          <Testimonial testimonial={testimonial} />
+        </div>
+      </section>
+    )
+  }
+
+  <!-- 9. Contact -->
+  <ContactCta />
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+    min-height: 100svh;
+    padding-top: calc(var(--nav-h) + var(--space-6));
+    padding-bottom: calc(var(--space-7) + var(--space-5));
+  }
+
+  .hero__video {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    opacity: 0.4;
+  }
+
+  .hero__inner {
+    position: relative;
+  }
+
+  .hero__content {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .hero__title {
+    width: fit-content;
+  }
+
+  .hero__lead {
+    max-width: 34ch;
+  }
+
+  /* Bottom centre: the flame glow of the Ambiance is too bright for small text in the corner */
+  .hero__cue {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: calc(var(--space-5) * -1 - var(--space-3));
+    width: max-content;
+    margin-inline: auto;
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--fs-small);
+    line-height: var(--lh-small);
+    letter-spacing: 0.04em;
+    color: var(--ink-muted);
+  }
+
+  .hero__cue :global(.hero__cue-arrow) {
+    animation: cue 1.8s var(--ease-in-out) infinite;
+  }
+
+  @keyframes cue {
+    0% {
+      transform: translateY(-4px);
+      opacity: 0;
+    }
+    40% {
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(6px);
+      opacity: 0;
+    }
+  }
+
+  /* The fragment sits bottom left: the text column starts to its right (tablet and desktop) */
+  @media (min-width: 768px) {
+    .hero__content {
+      margin-inline-start: var(--fragment-inset, 0px);
+    }
+  }
+
+  .manifesto {
+    padding-block: var(--space-8);
+  }
+
+  .manifesto__text {
+    width: fit-content;
+    font-size: var(--fs-h2);
+    line-height: var(--lh-h2);
+  }
+
+  .showcase__cta {
+    margin-top: var(--space-7);
+  }
+
+  .service-grid {
+    display: grid;
+    gap: var(--space-4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 640px) {
+    .service-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (min-width: 1100px) {
+    .service-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+  }
+
+  .clients {
+    padding-bottom: var(--space-8);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero__cue :global(.hero__cue-arrow) {
+      animation: none;
+    }
+  }
+</style>

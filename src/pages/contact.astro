@@ -1,0 +1,140 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+import ContactForm from '../components/ContactForm.astro';
+import { site } from '../config/site';
+import { externalHref, mailto, tel } from '../lib/placeholders';
+import { professionalService } from '../lib/seo';
+
+const socials = [
+  { label: 'Instagram', value: site.social.instagram, href: externalHref(site.social.instagram) },
+  { label: 'LinkedIn', value: site.social.linkedin, href: externalHref(site.social.linkedin) },
+];
+---
+
+<BaseLayout
+  title="Contact · Parlons de votre projet · Blue Ember"
+  description={`Décrivez votre projet, nous vous répondons sous ${site.responseDelay}. Prenez rendez-vous avec l'agence Blue Ember.`}
+  ember="contact"
+  ogImage="contact"
+  jsonLd={[professionalService(Astro.site!.origin)]}
+>
+  <section class="page-hero" aria-labelledby="page-title" data-ember-intensity="0.7">
+    <div class="container page-hero__inner">
+      <h1 class="page-hero__title" id="page-title" data-split data-ember="soft">Parlons de<br />votre projet.</h1>
+      <p class="t-lead measure" data-reveal data-ember="calm">Réponse sous {site.responseDelay}.</p>
+    </div>
+  </section>
+
+  <section class="section section--flush-top" aria-label="Formulaire et coordonnées" data-ember-intensity="0.7">
+    <div class="container avoid-fragment contact-layout">
+      <div class="contact-layout__form" data-reveal>
+        <ContactForm />
+      </div>
+
+      <aside class="contact-details" aria-label="Coordonnées" data-ember="calm">
+        {
+          site.bookingUrl && (
+            <div class="contact-details__booking" data-reveal>
+              <Button href={site.bookingUrl} variant="outline" target="_blank" rel="noopener noreferrer">
+                Réserver un créneau
+              </Button>
+            </div>
+          )
+        }
+        <dl class="contact-details__list">
+          <div data-reveal>
+            <dt class="label label--cool">E-mail</dt>
+            <dd><a href={mailto(site.email)}>{site.email}</a></dd>
+          </div>
+          <div data-reveal>
+            <dt class="label label--cool">Téléphone</dt>
+            <dd><a href={tel(site.phone)}>{site.phone}</a></dd>
+          </div>
+          <div data-reveal>
+            <dt class="label label--cool">Adresse</dt>
+            <dd>{site.address}</dd>
+          </div>
+          <div data-reveal>
+            <dt class="label label--cool">Réseaux</dt>
+            <dd>
+              <ul class="contact-details__social">
+                {
+                  socials.map((social) => (
+                    <li>
+                      <a
+                        href={social.href}
+                        target={social.href === '#' ? undefined : '_blank'}
+                        rel={social.href === '#' ? undefined : 'noopener noreferrer'}
+                      >
+                        {social.label}
+                      </a>
+                    </li>
+                  ))
+                }
+              </ul>
+            </dd>
+          </div>
+        </dl>
+      </aside>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact-layout {
+    display: grid;
+    gap: var(--space-7);
+  }
+
+  .contact-details {
+    display: grid;
+    gap: var(--space-5);
+    align-content: start;
+    justify-items: start;
+  }
+
+  .contact-details__list {
+    display: grid;
+    gap: var(--space-5);
+    margin: 0;
+  }
+
+  .contact-details__list dd {
+    margin: var(--space-1) 0 0;
+    font-size: var(--fs-lead);
+    line-height: var(--lh-lead);
+  }
+
+  .contact-details__list a {
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-underline-offset: 6px;
+    transition: text-decoration-color var(--dur-fast) var(--ease-out-expo);
+  }
+
+  .contact-details__list a:hover {
+    text-decoration-color: var(--flamme);
+  }
+
+  .contact-details__social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+  }
+
+  @media (min-width: 900px) {
+    .contact-layout {
+      grid-template-columns: repeat(12, minmax(0, 1fr));
+      column-gap: var(--space-4);
+    }
+
+    .contact-layout__form {
+      grid-column: 1 / span 7;
+    }
+
+    .contact-details {
+      grid-column: 9 / span 4;
+    }
+  }
+</style>

@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Button from '../components/Button.astro';
+---
+
+<BaseLayout
+  title="Page introuvable · Blue Ember"
+  description="Cette page n'existe pas ou n'existe plus. Revenez à l'accueil de Blue Ember."
+  ember="notfound"
+  ogImage="404"
+  noindex
+>
+  <section class="not-found" aria-labelledby="page-title" data-ember-intensity="1">
+    <div class="container not-found__inner">
+      <p class="label label--cool" data-reveal>Erreur 404</p>
+      <h1 class="t-hero not-found__title" id="page-title" data-split data-ember="soft">Cette page<br />s'est éteinte.</h1>
+      <div data-reveal>
+        <Button href="/">Retour à l'accueil</Button>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: flex;
+    align-items: center;
+    min-height: 100svh;
+    padding-block: calc(var(--nav-h) + var(--space-6)) var(--space-8);
+  }
+
+  .not-found__inner {
+    display: grid;
+    gap: var(--space-5);
+    justify-items: start;
+  }
+
+  .not-found__title {
+    width: fit-content;
+  }
+</style>

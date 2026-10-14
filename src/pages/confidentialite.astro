@@ -1,0 +1,53 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import { site } from '../config/site';
+import { mailto } from '../lib/placeholders';
+
+const { legal } = site;
+---
+
+<LegalLayout
+  title="Confidentialité · Blue Ember"
+  description="Comment Blue Ember traite vos données personnelles : finalités, durée de conservation et vos droits."
+  heading="Confidentialité"
+  ogImage="confidentialite"
+>
+  <section aria-labelledby="controller">
+    <h2 id="controller">Responsable du traitement</h2>
+    <p>{legal.companyName}, {legal.address}. Contact : <a href={mailto(legal.dpoEmail)}>{legal.dpoEmail}</a>.</p>
+  </section>
+
+  <section aria-labelledby="collected">
+    <h2 id="collected">Données collectées</h2>
+    <p>
+      Le formulaire de contact recueille votre nom, votre entreprise, votre adresse e-mail, votre numéro de téléphone (facultatif), votre
+      budget et votre message. L'inscription à la newsletter recueille votre adresse e-mail.
+    </p>
+  </section>
+
+  <section aria-labelledby="purposes">
+    <h2 id="purposes">Finalités et base légale</h2>
+    <p>[À FOURNIR : finalités et base légale de chaque traitement, 80 à 120 mots]</p>
+  </section>
+
+  <section aria-labelledby="retention">
+    <h2 id="retention">Durée de conservation</h2>
+    <p>[À FOURNIR : durées de conservation par type de donnée, 40 à 80 mots]</p>
+  </section>
+
+  <section aria-labelledby="rights">
+    <h2 id="rights">Vos droits</h2>
+    <p>
+      Vous pouvez accéder à vos données, les rectifier, les effacer, limiter leur traitement, vous y opposer et demander leur
+      portabilité. Écrivez à <a href={mailto(legal.dpoEmail)}>{legal.dpoEmail}</a>. Vous pouvez aussi saisir la CNIL.
+    </p>
+  </section>
+
+  <section aria-labelledby="cookies">
+    <h2 id="cookies">Cookies et mesure d'audience</h2>
+    <p>
+      Ce site ne dépose aucun cookie non essentiel. La mesure d'audience, lorsqu'elle est activée, fonctionne sans cookie et sans
+      donnée personnelle. Les polices sont hébergées sur le site : aucun appel à un service tiers de polices.
+    </p>
+  </section>
+</LegalLayout>

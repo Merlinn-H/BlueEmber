@@ -1,0 +1,99 @@
+---
+import { existsSync } from 'node:fs';
+import { join } from 'node:path';
+
+interface Props {
+  /** dark: ivoire on dark. light: charbon on ivoire. icon: "b." for favicon and social. */
+  variant?: 'dark' | 'light' | 'icon';
+  /** Font size of "blue.ember" in px (minimum 15). */
+  size?: number;
+  /** Adds a halo layer behind the dot, used by the preloader pulse. */
+  halo?: boolean;
+  class?: string;
+}
+
+const { variant = 'dark', size = 26, halo = false, class: className } = Astro.props;
+const fontSize = Math.max(15, size);
+// "agency" is dropped below 40px of lockup height (logo + agency line)
+const agencySize = (fontSize * 12) / 26;
+const showAgency = variant !== 'icon' && fontSize + agencySize >= 40;
+
+// public/brand/logo.svg (and optionally logo-light.svg) replaces the typographic placeholder.
+const assetName = variant === 'light' ? 'logo-light.svg' : 'logo.svg';
+const hasAsset = variant !== 'icon' && existsSync(join(process.cwd(), 'public', 'brand', assetName));
+---
+
+{
+  hasAsset ? (
+    <img class:list={['logo-img', className]} src={`/brand/${assetName}`} alt="Blue Ember agency" height={fontSize * 1.4} />
+  ) : (
+    <span class:list={['logo', `logo--${variant}`, className]} style={`--logo-size:${fontSize}px`}>
+      <span class="logo__word" aria-hidden="true">{variant === 'icon' ? 'b' : 'blue'}<span class="logo__dot">.{halo && <span class="logo__halo" />}</span>{variant === 'icon' ? '' : 'ember'}</span>
+      {showAgency && (
+        <span class="logo__agency" aria-hidden="true">
+          agency
+        </span>
+      )}
+      <span class="sr-only">Blue Ember agency</span>
+    </span>
+  )
+}
+
+<style>
+  .logo {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: flex-end;
+    line-height: 1;
+    color: var(--ivoire);
+    user-select: none;
+  }
+
+  .logo--light {
+    color: var(--charbon);
+  }
+
+  .logo__word {
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: var(--logo-size);
+    line-height: 1;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+
+  .logo__dot {
+    position: relative;
+    color: var(--flamme);
+  }
+
+  /* Soft ember glow behind the dot (opacity and transform only) */
+  .logo__halo {
+    position: absolute;
+    left: 50%;
+    bottom: 0.06em;
+    width: 0.9em;
+    height: 0.9em;
+    margin: 0 0 -0.4em -0.45em;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(240, 90, 28, 0.85), rgba(240, 90, 28, 0) 68%);
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* "agency" : Instrument Sans 400, minuscules, espace de 0,55em, aligne a droite */
+  .logo__agency {
+    font-family: var(--font-body);
+    font-weight: 400;
+    font-size: calc(var(--logo-size) * 12 / 26);
+    line-height: 1;
+    letter-spacing: 0.55em;
+    margin-right: -0.55em;
+    margin-top: calc(var(--logo-size) * 0.08);
+  }
+
+  .logo-img {
+    display: block;
+    width: auto;
+  }
+</style>

@@ -1,0 +1,96 @@
+---
+// Auto-scrolling band (project strip, client logos). The list given in the slot is rendered twice:
+// the second copy is aria-hidden and inert, so it is never focusable. See src/scripts/motion/marquee.ts.
+interface Props {
+  /** Resting speed in px/s (desktop). */
+  speed?: number;
+  /** Resting speed in px/s (mobile). */
+  speedMobile?: number;
+  /** Speed under the mouse in px/s. 0 disables the slow-down. */
+  hoverSpeed?: number;
+  /** Mouse/finger dragging with inertia. */
+  drag?: boolean;
+  /** Page scroll speeds the band up (speed + scroll velocity x 0.3). */
+  boost?: boolean;
+  /** Horizontal mouse drift in px (the band slides by plus or minus this). */
+  parallax?: number;
+  label: string;
+  class?: string;
+}
+
+const { speed = 40, speedMobile = speed, hoverSpeed = 0, drag = false, boost = false, parallax = 0, label, class: className } = Astro.props;
+---
+
+<div
+  class:list={['marquee', className]}
+  data-marquee
+  data-speed={speed}
+  data-speed-mobile={speedMobile}
+  data-hover-speed={hoverSpeed}
+  data-drag={drag ? '' : undefined}
+  data-boost={boost ? '' : undefined}
+  data-parallax={parallax}
+>
+  <div class="marquee__inner" data-marquee-inner>
+    <ul class="marquee__track" data-marquee-track aria-label={label}>
+      <slot />
+    </ul>
+    <ul class="marquee__track marquee__track--clone" data-marquee-clone aria-hidden="true" inert>
+      <slot />
+    </ul>
+  </div>
+</div>
+
+<style is:global>
+  /* Default (no JavaScript, or prefers-reduced-motion): a hand-scrollable row, no clone */
+  .marquee {
+    width: 100%;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
+  }
+
+  .marquee__inner {
+    display: flex;
+    width: max-content;
+  }
+
+  .marquee__track {
+    display: flex;
+    flex: none;
+    gap: var(--space-4);
+    padding-inline: var(--gutter) var(--space-4);
+  }
+
+  .marquee__track--clone {
+    display: none;
+  }
+
+  /* Animated mode, enabled by the script */
+  .marquee[data-marquee-active] {
+    overflow: hidden;
+    touch-action: pan-y;
+    cursor: default;
+  }
+
+  .marquee[data-marquee-active] .marquee__inner {
+    will-change: transform;
+  }
+
+  .marquee[data-marquee-active] .marquee__track {
+    padding-inline: 0 var(--space-4);
+  }
+
+  .marquee[data-marquee-active] .marquee__track--clone {
+    display: flex;
+  }
+
+  .marquee[data-dragging] {
+    user-select: none;
+  }
+
+  .marquee[data-dragging] a {
+    pointer-events: none;
+  }
+</style>

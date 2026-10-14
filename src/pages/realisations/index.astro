@@ -1,0 +1,88 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Button from '../../components/Button.astro';
+import ProjectCard from '../../components/ProjectCard.astro';
+import ContactCta from '../../components/ContactCta.astro';
+
+const projects = (await getCollection('projets')).sort((a, b) => a.data.order - b.data.order);
+
+const filters = [
+  { value: 'all', label: 'Tous' },
+  { value: 'video', label: 'Vidéo' },
+  { value: 'marketing', label: 'Marketing' },
+  { value: 'tech', label: 'Tech' },
+];
+---
+
+<BaseLayout
+  title="Réalisations · Projets marketing, vidéo et web · Blue Ember"
+  description="Découvrez nos projets et leurs résultats chiffrés pour des PME et des grandes entreprises."
+  ember="realisations"
+  ogImage="realisations"
+>
+  <section class="page-hero" aria-labelledby="page-title" data-ember-intensity="0.9">
+    <div class="container page-hero__inner">
+      <p class="label label--cool" data-reveal>Réalisations</p>
+      <h1 class="page-hero__title" id="page-title" data-split data-ember="soft">Réalisations</h1>
+    </div>
+  </section>
+
+  <section class="section section--flush-top" aria-label="Liste des réalisations" data-ember-intensity="0.9" data-projects-section>
+    <div class="container">
+      <div class="filters" role="group" aria-label="Filtrer les réalisations" data-filters data-reveal>
+        {
+          filters.map((filter) => (
+            <Button
+              variant="outline"
+              size="sm"
+              magnetic={false}
+              aria-pressed={filter.value === 'all' ? 'true' : 'false'}
+              data-filter={filter.value}
+            >
+              {filter.label}
+            </Button>
+          ))
+        }
+      </div>
+      <p class="sr-only" role="status" aria-live="polite" data-filter-status></p>
+
+      <ul class="projects-grid" data-projects>
+        {
+          projects.map((project) => (
+            <li class="projects-grid__item" data-type={project.data.type}>
+              <ProjectCard project={project} level="h2" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <ContactCta />
+</BaseLayout>
+
+<style>
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-7);
+  }
+
+  .projects-grid {
+    display: grid;
+    gap: var(--space-7) var(--space-4);
+    grid-template-columns: 1fr;
+  }
+
+  @media (min-width: 768px) {
+    .projects-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  .projects-grid__item[hidden] {
+    display: none;
+  }
+</style>

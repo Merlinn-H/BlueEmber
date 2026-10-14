@@ -1,0 +1,36 @@
+---
+// Video wrapper: src + poster + optional lighter mobile version. Decorative by default.
+interface Props {
+  src: string;
+  poster: string;
+  mobileSrc?: string;
+  /** Loop silently in the background (hero) instead of waiting for a play action. */
+  background?: boolean;
+  class?: string;
+}
+const { src, poster, mobileSrc, background = true, class: className } = Astro.props;
+---
+
+<video
+  class:list={['video', className]}
+  poster={poster}
+  muted
+  loop={background}
+  autoplay={background}
+  playsinline
+  preload="metadata"
+  aria-hidden="true"
+  tabindex="-1"
+  data-video
+>
+  {mobileSrc && <source src={mobileSrc} media="(max-width: 767px)" />}
+  <source src={src} />
+</video>
+
+<style>
+  .video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>
