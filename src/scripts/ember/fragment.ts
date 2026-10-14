@@ -68,6 +68,7 @@ export class FragmentTracker {
 
   /** Dims the fragment (-30 %) while a long reading zone is on screen. Returns a teardown. */
   watchReadingZones(): () => void {
+    if (!this.element) return () => undefined;
     let active = 0;
     const set = () => this.stage.style.setProperty('--fragment-light', active > 0 ? '0.7' : '1');
     const triggers = [...document.querySelectorAll<HTMLElement>('[data-ember="calm"]')]

@@ -65,6 +65,9 @@ export function initEmber(): EmberHandle | null {
   let canvas = firstCanvas;
   const params: EmberParams = structuredClone(emberDefaults);
   const frame = createFrameData(params);
+  // The cool glow of the Ambiance is attenuated in CSS; the pile has to let exactly that much of it show through
+  const glowCool = Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--glow-cool'));
+  frame.glowCool = Number.isFinite(glowCool) ? glowCool : 1;
   const sim = new EmberSim(params);
   const zones = new ZoneTracker();
   const fragment = new FragmentTracker(stage);
@@ -202,7 +205,7 @@ export function initEmber(): EmberHandle | null {
     // Stop when the trail is out, no spark or ring is alive and nothing moved for a while
     const idle =
       now - sim.lastInput > params.render.idleMs &&
-      sim.energy(now) < 0.004 &&
+      sim.energy(now) < 0.02 &&
       sim.sparks.length === 0 &&
       sim.burstCount === 0 &&
       !breathing &&

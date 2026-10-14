@@ -3,10 +3,10 @@ import { MAX_ZONES, type FrameData } from './types';
 
 // Readability zones (brief 7.6) and per-section intensity.
 //   data-ember="calm"  long reading text, forms, case studies: the effect is reduced by 70 % (calm strength
-//                      can be overridden with data-ember-calm="1") and the heat is capped so the cracks
-//                      stay dark blue behind the text.
-//   data-ember="soft"  display titles: no reduction, but the heat is capped at the crack colour, so the pale
-//                      and ivory stages never sit under ivory text.
+//                      can be overridden with data-ember-calm="1") and the heat is capped so the fissures
+//                      stay deep red behind the text.
+//   data-ember="soft"  display titles: no reduction, but the heat is capped at plain red, so the amber
+//                      and white-hot stages never sit under ivory text.
 //   data-ember-intensity="0.6" on a section: effect strength while that section crosses the middle of the screen.
 // Rects are measured in document coordinates and only re-measured when the layout changes.
 interface ZoneItem {

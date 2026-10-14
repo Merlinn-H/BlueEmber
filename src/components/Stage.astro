@@ -1,9 +1,11 @@
 ---
-// Fixed scene behind the whole site: Ambiance (z0), WebGL canvas (z1), fragment (z2), then the content.
+// Fixed scene behind the whole site: Ambiance (z0), WebGL canvas (z1), fragment (z2), grain (z3), then the content.
 // The element persists across page navigations (transition:persist), so the canvas is never recreated.
-// The grain is the ::after of .ambiance, as in the design system (6.1).
+// The grain is the ::after of .stage, above the canvas and the fragment (brief 7.5): it covers the revealed pile
+// too, so the patch around the pointer has the same grain as the background and shows no seam.
 import { existsSync } from 'node:fs';
 import { join } from 'node:path';
+import { fragmentEnabled } from '../config/ember';
 
 const has = (file: string) => existsSync(join(process.cwd(), 'public', file));
 const finalFragment = has('scene/fragment-flamme.webp');
@@ -19,7 +21,11 @@ const cracksSrc = has('textures/ember-cracks.webp') ? '/textures/ember-cracks.we
     <div class="ambiance__glow ambiance__glow--warm" data-glow="warm"></div>
   </div>
   <canvas class="ember-canvas" data-ember-canvas></canvas>
-  <img class="fragment" data-fragment src={fragmentSrc} data-mask={maskSrc} alt="" width="600" height="800" decoding="async" />
+  {
+    fragmentEnabled && (
+      <img class="fragment" data-fragment src={fragmentSrc} data-mask={maskSrc} alt="" width="600" height="800" decoding="async" />
+    )
+  }
 </div>
 
 <style is:global>
@@ -33,15 +39,18 @@ const cracksSrc = has('textures/ember-cracks.webp') ? '/textures/ember-cracks.we
     container-type: size;
   }
 
-  /* Fond Ambiance : charbon + deux lueurs (titane haut gauche, flamme bas droite) + grain.
-     Les lueurs sont deux calques separes pour pouvoir bouger de 20px au maximum (transform). */
+  /* Fond Ambiance : charbon + deux lueurs (titane haut gauche, flamme bas droite).
+     Les lueurs sont deux calques separes pour pouvoir bouger de 20px au maximum (transform).
+     Ces lueurs sont aussi recalculees dans le shader de la braise (ambientGlow, src/scripts/ember/shaders.ts) :
+     si on change leurs tailles ou leurs couleurs ici, il faut les changer la-bas. */
   .ambiance {
     position: absolute;
     inset: 0;
     background: var(--charbon);
   }
 
-  .ambiance::after {
+  /* Grain fixe au-dessus de la braise et du fragment, sous le contenu */
+  .stage::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -57,9 +66,11 @@ const cracksSrc = has('textures/ember-cracks.webp') ? '/textures/ember-cracks.we
     will-change: transform;
   }
 
+  /* Lueur froide attenuee et un peu moins large (--glow-cool dans tokens.css) : elle concurrencait la braise */
   .ambiance__glow--cool {
+    opacity: var(--glow-cool, 1);
     background: radial-gradient(
-      ellipse 70% 80% at 24px 24px,
+      ellipse 62% 70% at 24px 24px,
       rgba(76, 120, 168, 0.95) 0%,
       rgba(47, 70, 112, 0.7) 30%,
       rgba(27, 39, 51, 0.3) 55%,
@@ -78,7 +89,7 @@ const cracksSrc = has('textures/ember-cracks.webp') ? '/textures/ember-cracks.we
   }
 
   /* Optional film jitter (html[data-grain-jitter]): a few pixels every 120ms, transform only */
-  html[data-grain-jitter] .ambiance::after {
+  html[data-grain-jitter] .stage::after {
     inset: -8px;
     animation: grain-jitter 120ms steps(1) infinite;
   }
@@ -139,7 +150,7 @@ const cracksSrc = has('textures/ember-cracks.webp') ? '/textures/ember-cracks.we
       will-change: auto;
     }
 
-    html[data-grain-jitter] .ambiance::after {
+    html[data-grain-jitter] .stage::after {
       animation: none;
     }
   }

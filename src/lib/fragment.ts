@@ -1,4 +1,4 @@
-import { emberMobileFragment, emberPages, type EmberPageKey, type FragmentSpec } from '../config/ember';
+import { emberMobileFragment, emberPages, fragmentEnabled, type EmberPageKey, type FragmentSpec } from '../config/ember';
 
 /** Intrinsic CSS width of the fragment element; other sizes are reached with scale(). */
 export const FRAGMENT_BASE_VW = 30;
@@ -29,6 +29,8 @@ function place(spec: FragmentSpec) {
  * Desktop (-d) and mobile (-m) variants; the CSS picks one with a media query.
  */
 export function fragmentStyle(page: EmberPageKey): string {
+  // Without the fragment the text columns keep the normal page margin
+  if (!fragmentEnabled) return '--fragment-inset:0px';
   const spec = emberPages[page].fragment;
   const desktop = place(spec);
   const mobile = place({

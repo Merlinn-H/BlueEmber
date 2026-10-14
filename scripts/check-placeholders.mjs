@@ -97,7 +97,10 @@ const exists = (p) => existsSync(join(root, 'public', p));
 if (!exists('brand/logo.svg')) {
   brandRows.push(['public/brand/logo.svg', 'Logo SVG (version ivoire pour fond sombre). Optionnel : logo-light.svg (charbon). Remplace le logo typographique.']);
 }
-if (!exists('scene/fragment-flamme.webp')) {
+// The fragment is optional (fragmentEnabled in src/config/ember.ts). Read as text: this script runs after every build,
+// where a TypeScript file cannot always be imported.
+const fragmentOn = /export const fragmentEnabled\s*=\s*true/.test(readFileSync(join(root, 'src', 'config', 'ember.ts'), 'utf8'));
+if (fragmentOn && !exists('scene/fragment-flamme.webp')) {
   brandRows.push(['public/scene/fragment-flamme.webp', 'Rendu 3D (Blender) de la flamme en bas-relief, WebP avec transparence, ratio 3:4 (ex. 1200 x 1600 px), ≈ 150 Ko, même cadrage que le SVG']);
 }
 if (!exists('textures/ember-cracks.webp')) {

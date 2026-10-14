@@ -89,6 +89,10 @@
   --z-menu: 110;
   --z-curtain: 9000;
   --z-cursor: 9999;
+
+  /* Ecart au design system (6.1), voulu par le porteur du projet : la lueur bleue de l'Ambiance concurrencait la braise.
+     Force de la lueur titane en haut a gauche, 1 = valeur d'origine du design system. */
+  --glow-cool: 0.25;
 }
 
 @media (min-width: 768px) {

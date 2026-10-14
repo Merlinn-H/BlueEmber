@@ -4,8 +4,8 @@ import { SPARK_CAPACITY, SPARK_STRIDE, type EmberRenderer, type FrameData, type 
 // Raw WebGL2 renderer (no library: the effect JS budget is 30 KB gzip).
 //  1. Trail buffer: two R16F targets in ping-pong at 1/4 of the viewport resolution (RGBA8 fallback).
 //     Each frame: next = max(previous x exp(-dt/tau), brush segments) + click rings.
-//  2. Ember pass: the procedural ember is drawn at `scale` x the canvas resolution, masked by the trail,
-//     the calm zones and the page intensity, with the halo and the fragment rim light.
+//  2. Ember pass: the procedural coal is drawn at `scale` x the canvas resolution, masked by the trail
+//     (the wiped soot), the calm zones and the page intensity, with the warm glow and the fragment rim light.
 //  3. Sparks: one draw call of GL points.
 
 interface ProgramInfo {
@@ -180,6 +180,7 @@ export class WebGLRenderer implements EmberRenderer {
     const e = this.ember;
     gl.uniform2f(this.u(e, 'uView'), frame.width, frame.height);
     gl.uniform1f(this.u(e, 'uTime'), frame.time);
+    gl.uniform1f(this.u(e, 'uGlowCool'), frame.glowCool);
     gl.uniform1f(this.u(e, 'uIntensity'), frame.intensity);
     gl.uniform1i(this.u(e, 'uZoneN'), frame.zoneCount);
     gl.uniform4fv(this.u(e, 'uZone'), frame.zones);
@@ -196,6 +197,10 @@ export class WebGLRenderer implements EmberRenderer {
     gl.uniform1f(this.u(e, 'uErosion'), p.brush.edgeNoise);
     gl.uniform1f(this.u(e, 'uHalo'), p.look.halo);
     gl.uniform1f(this.u(e, 'uCore'), p.look.core);
+    gl.uniform1f(this.u(e, 'uCrust'), p.look.crust);
+    gl.uniform1f(this.u(e, 'uGlow'), p.look.glow);
+    gl.uniform1f(this.u(e, 'uWood'), p.look.wood);
+    gl.uniform1f(this.u(e, 'uRelief'), p.look.relief);
     gl.uniform1f(this.u(e, 'uRim'), p.rim.opacity);
     gl.uniform1f(this.u(e, 'uRimPx'), p.rim.width);
     gl.uniform1f(this.u(e, 'uUseTex'), this.hasCracks ? 1 : 0);

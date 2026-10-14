@@ -1,6 +1,7 @@
 // WCAG contrast figures for the palette, the Ambiance glows and the ember at its brightest allowed states
 // (brief 7.6 and 12: text >= 4.5:1, also on the maximum revealed state). Usage: npm run contrast:check
 // The ember ramp below mirrors the shader in src/scripts/ember/shaders.ts; the caps come from src/config/ember.ts.
+import { readFileSync } from 'node:fs';
 import { emberDefaults } from '../src/config/ember.ts';
 
 const hex = (value) => [1, 3, 5].map((i) => parseInt(value.slice(i, i + 2), 16) / 255);
@@ -30,26 +31,42 @@ const C = {
   ivoire: hex('#f6eee3'),
 };
 
-/** Ember colour for a heat value: same stops as the shader (ash, edge, crack, incandescent, core). */
-function ember(heat, ashTone = 0.5) {
-  let c = mix(hex('#15110f'), hex('#2a2421'), ashTone);
-  c = mix(c, hex('#2f4670'), smooth(0.04, 0.28, heat));
-  c = mix(c, hex('#4c78a8'), smooth(0.26, 0.62, heat));
-  c = mix(c, hex('#9db3c6'), smooth(0.62, 0.95, heat));
-  c = mix(c, hex('#f6eee3'), smooth(0.95, 1.25, heat));
+const look = emberDefaults.look;
+
+/** Fissure colour for a heat value: same stops as the shader (deep red, red, flamme, amber, white hot). */
+function fissure(heat) {
+  let c = [0.302, 0.0627, 0.0353];
+  c = mix(c, [0.7804, 0.149, 0.0627], smooth(0.06, 0.3, heat));
+  c = mix(c, [0.9412, 0.3529, 0.1098], smooth(0.38, 0.78, heat));
+  c = mix(c, [0.9529, 0.6039, 0.251], smooth(0.78, 1.1, heat) * look.core);
+  c = mix(c, [0.9647, 0.8784, 0.7608], smooth(1.1, 1.5, heat) * look.core);
   return c;
 }
 
+/**
+ * Worst-case colour of the revealed pile over the charbon page for a heat value: the lightest tone the pieces can
+ * reach (the shader clamps every channel to CRUST_MAX) at their opacity, with the fissure over it (fully opaque
+ * from heat 0.2).
+ */
+const CRUST_MAX = 0.26;
+function ember(heat) {
+  const crust = over([CRUST_MAX, CRUST_MAX, CRUST_MAX], look.crust, C.charbon);
+  return over(fissure(heat), smooth(0.015, 0.2, heat), crust);
+}
+
 const z = emberDefaults.zones;
-const haloAlpha = 0.35;
+const underglow = { color: [0.62, 0.12, 0.05], alpha: 0.14 * look.halo };
 // Backgrounds text can sit on
 const nuit85 = over(C.nuit, 0.85, C.charbon);
-const coolPeak = over(C.chauffe, 0.95, C.charbon); // Ambiance, top-left corner
+// The blue Ambiance glow is attenuated by --glow-cool (src/styles/tokens.css, 1 = design-system value)
+const tokens = readFileSync(new URL('../src/styles/tokens.css', import.meta.url), 'utf8');
+const glowCool = Number(tokens.match(/--glow-cool:\s*([\d.]+)/)?.[1] ?? 1);
+const coolPeak = over(C.chauffe, 0.95 * glowCool, C.charbon); // Ambiance, top-left corner
 const warmPeak = over(C.flamme, 0.95, C.charbon); // Ambiance, bottom-right corner
 const calmEmber = ember(z.calmCap);
-const calmWithHalo = over(C.chauffe, haloAlpha * (1 - z.reduce), calmEmber);
+const calmWithGlow = over(underglow.color, underglow.alpha * (1 - z.reduce), calmEmber);
 const softEmber = ember(z.softCap);
-const maxEmber = ember(1.4);
+const maxEmber = ember(1.5);
 
 const backgrounds = [
   ['charbon (page)', C.charbon],
@@ -57,9 +74,9 @@ const backgrounds = [
   ['titane-nuit 85 % (alternate sections)', nuit85],
   ['Ambiance cool glow, peak (top-left corner)', coolPeak],
   ['Ambiance flame glow, peak (bottom-right corner)', warmPeak],
-  [`ember under long text (calmCap ${z.calmCap}, +halo)`, calmWithHalo],
-  [`ember under display titles (softCap ${z.softCap})`, softEmber],
-  ['ember unconstrained (core, free space only)', maxEmber],
+  [`coal under long text (calmCap ${z.calmCap}, + warm glow)`, calmWithGlow],
+  [`coal under display titles (softCap ${z.softCap})`, softEmber],
+  ['coal unconstrained (amber core, free space only)', maxEmber],
 ];
 const texts = [
   ['ivoire (ink)', C.ivoire, 4.5],
@@ -83,7 +100,7 @@ backgrounds.forEach(([label, bg], index) => {
 
 // Large display titles only need 3:1
 const titleRatio = ratio(C.ivoire, softEmber);
-console.log(`\nIvory display title (large text, needs 3:1) over the soft-zone ember: ${titleRatio.toFixed(1)}:1 ${titleRatio >= 3 ? 'ok' : 'LOW'}`);
+console.log(`\nIvory display title (large text, needs 3:1) over the soft-zone coal: ${titleRatio.toFixed(1)}:1 ${titleRatio >= 3 ? 'ok' : 'LOW'}`);
 if (titleRatio < 3) failures++;
 
 console.log(

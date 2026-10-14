@@ -1,4 +1,6 @@
-// Settings of the "ember that reveals itself" effect (brief section 7).
+// Settings of the "ember that reveals itself" effect (brief section 7), redesigned as soot wiped off red-hot coal:
+// the charcoal background reveals glowing coal where the pointer passes, very subtly (the brief's blue ember
+// of 7.2 was dropped on purpose).
 // One entry per page type; the global tuning values are in `emberDefaults` and can be adjusted
 // live with ?debug in the URL, then copied back here.
 
@@ -52,6 +54,13 @@ export const emberPages: Record<EmberPageKey, EmberPage> = {
 /** Mobile: the fragment is about 40vw wide, always at the bottom, cut by a side edge. */
 export const emberMobileFragment = { size: 40, cutX: 0.3, cutY: 0.1 } as const;
 
+/**
+ * The sculpted flame fixed to the wall (brief 7.3). Switched off at the owner's request: no element, no rim light, and
+ * the text columns keep the normal page margin. Set to true to bring it back (public/scene/fragment-flamme.svg is the
+ * placeholder, the final Blender render goes to public/scene/fragment-flamme.webp).
+ */
+export const fragmentEnabled = false;
+
 /** Global tuning values. The ?debug panel edits a copy of this object live. */
 export interface EmberParams {
   brush: {
@@ -59,7 +68,7 @@ export interface EmberParams {
     radiusMin: number;
     /** Brush radius at high speed. */
     radiusMax: number;
-    /** Roughness of the burnt edge of the reveal (0 = clean gaussian). */
+    /** Grain of the soot edge of the wipe (0 = clean gaussian). */
     edgeNoise: number;
   };
   speed: {
@@ -73,31 +82,39 @@ export interface EmberParams {
     tau: number;
   };
   look: {
-    /** Size of the cracks cells (px). */
+    /** Size of the pieces of charcoal and wood (px). The gaps between them are the fissures. */
     crackScale: number;
-    /** Width of the cracks (in cell units). */
+    /** Width of the gaps between the pieces (in cell units). */
     crackWidth: number;
-    /** Size of the ash clouds (px). */
+    /** Size of the clouds in the slow mottling of the pieces (px). */
     ashScale: number;
     /** Heat distortion, maximum offset in px. */
     heat: number;
-    /** Breathing of the cracks (+- share of brightness). */
+    /** Breathing of the fissures (+- share of brightness). */
     flicker: number;
-    /** Strength of the blue halo around the cursor (1 = rgba(76,120,168,.35)). */
+    /** Warm glow around the cursor (1 = 14 % opaque red). */
     halo: number;
-    /** Share of the ivory hot core (0 hides it). */
+    /** Share of the amber / white-hot core at the hottest points (0 hides it). */
     core: number;
+    /** Opacity of the pieces that show where the soot is wiped (0 = only the glow shows). */
+    crust: number;
+    /** Brightness of the fissures (0.4 = deep red to red right at the cursor, 1 = flamme orange). */
+    glow: number;
+    /** Share of wood among the pieces (the rest is charcoal). */
+    wood: number;
+    /** Strength of the relief: lighting and sheen of the pieces (0 = flat). */
+    relief: number;
   };
   sparks: {
     max: number;
-    /** Most sparks born per frame at full speed. */
+    /** Expected sparks born per frame at full speed (fractional: 0.5 is about 30 per second at 60 fps). */
     perFrame: number;
     riseMin: number;
     riseMax: number;
     lifeMin: number;
     lifeMax: number;
-    /** Share of orange sparks (the rest is titane-pale / ivory). */
-    orangeShare: number;
+    /** Share of amber sparks (the rest is flame orange). */
+    hotShare: number;
   };
   burst: {
     radius: number;
@@ -111,7 +128,7 @@ export interface EmberParams {
     fade: number;
     /** Heat ceiling under long text (keeps contrast above 4.5:1, see npm run contrast:check). */
     calmCap: number;
-    /** Heat ceiling under display titles: cracks stay blue, never pale or ivory. */
+    /** Heat ceiling under display titles: the fissures stay red, never amber or white. */
     softCap: number;
   };
   rim: {
@@ -135,13 +152,13 @@ export interface EmberParams {
 }
 
 export const emberDefaults: EmberParams = {
-  brush: { radiusMin: 90, radiusMax: 160, edgeNoise: 0.35 },
-  speed: { reference: 1500, minIntensity: 0.25 },
-  trail: { tau: 0.45 },
-  look: { crackScale: 170, crackWidth: 0.055, ashScale: 260, heat: 4, flicker: 0.15, halo: 1, core: 1 },
-  sparks: { max: 200, perFrame: 3, riseMin: 40, riseMax: 120, lifeMin: 1, lifeMax: 1.5, orangeShare: 0.15 },
-  burst: { radius: 260, duration: 0.6, sparks: 20 },
-  zones: { reduce: 0.7, fade: 40, calmCap: 0.15, softCap: 0.6 },
-  rim: { opacity: 0.4, width: 10 },
+  brush: { radiusMin: 90, radiusMax: 160, edgeNoise: 0.5 },
+  speed: { reference: 1500, minIntensity: 0.55 },
+  trail: { tau: 0.55 },
+  look: { crackScale: 125, crackWidth: 0.03, ashScale: 200, heat: 3, flicker: 0.2, halo: 0.5, core: 0.15, crust: 0.8, glow: 0.38, wood: 0.25, relief: 1 },
+  sparks: { max: 40, perFrame: 0.3, riseMin: 30, riseMax: 90, lifeMin: 0.9, lifeMax: 1.4, hotShare: 0.2 },
+  burst: { radius: 260, duration: 0.6, sparks: 6 },
+  zones: { reduce: 0.7, fade: 40, calmCap: 0.15, softCap: 0.5 },
+  rim: { opacity: 0.3, width: 10 },
   render: { scale: 0.5, minScale: 0.35, dprMax: 1.5, idleMs: 2500, fpsFloor: 45 },
 };

@@ -4,7 +4,7 @@ Fichier généré par `npm run placeholders:check`. Ne pas éditer à la main.
 
 - Textes entre crochets : 208 occurrences dans 26 fichiers (163 uniques par fichier)
 - Images placeholders référencées : 69
-- Assets de marque à fournir : 4
+- Assets de marque à fournir : 3
 
 Remplacer un texte : modifier la valeur dans le fichier indiqué. Remplacer une image : déposer le fichier réel dans `public/`
 (par exemple `public/images/`), puis changer le chemin dans le front-matter du contenu concerné.
@@ -14,7 +14,6 @@ Remplacer un texte : modifier la valeur dans le fichier indiqué. Remplacer une 
 | Fichier | Format attendu |
 |---|---|
 | `public/brand/logo.svg` | Logo SVG (version ivoire pour fond sombre). Optionnel : logo-light.svg (charbon). Remplace le logo typographique. |
-| `public/scene/fragment-flamme.webp` | Rendu 3D (Blender) de la flamme en bas-relief, WebP avec transparence, ratio 3:4 (ex. 1200 x 1600 px), ≈ 150 Ko, même cadrage que le SVG |
 | `public/textures/ember-cracks.webp` | (Optionnel) texture de fissures 512 px, moins de 150 Ko : remplace la texture procédurale de la braise |
 | `public/og/{accueil, services, realisations, projet, agence, contact, mentions-legales, confidentialite, 404}.png` | 1200 x 630 px, PNG ou JPG, 300 Ko max. Placeholders générés : les remplacer par les visuels réels (même nom de fichier) |
 
@@ -423,10 +422,10 @@ Remplacer un texte : modifier la valeur dans le fichier indiqué. Remplacer une 
 
 | Ligne | Placeholder | Contenu attendu |
 |---|---|---|
-| 24 | `[CHIFFRE-1]` | Nombre seul (ex. 120) : il est compté à l'apparition |
-| 25 | `[CHIFFRE-2]` | Nombre seul (ex. 120) : il est compté à l'apparition |
-| 26 | `[CHIFFRE-3]` | Nombre seul (ex. 120) : il est compté à l'apparition |
-| 26 | `[INDICATEUR]` | Nom de l'indicateur (ex. chiffre d'affaires) |
+| 25 | `[CHIFFRE-1]` | Nombre seul (ex. 120) : il est compté à l'apparition |
+| 26 | `[CHIFFRE-2]` | Nombre seul (ex. 120) : il est compté à l'apparition |
+| 27 | `[CHIFFRE-3]` | Nombre seul (ex. 120) : il est compté à l'apparition |
+| 27 | `[INDICATEUR]` | Nom de l'indicateur (ex. chiffre d'affaires) |
 
 ### `src/pages/mentions-legales.astro`
 

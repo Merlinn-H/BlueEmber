@@ -21,6 +21,8 @@ export interface FrameData {
   intensity: number;
   /** exp(-dt / tau): trail decay for this frame. */
   decay: number;
+  /** Strength of the cool Ambiance glow (--glow-cool in tokens.css): the pile lets that glow show through. */
+  glowCool: number;
 
   segmentCount: number;
   /** x0, y0, x1, y1 (CSS px) per segment. */
@@ -73,6 +75,7 @@ export function createFrameData(params: EmberParams): FrameData {
     height: 0,
     intensity: 1,
     decay: 1,
+    glowCool: 1,
     segmentCount: 0,
     segments: new Float32Array(MAX_SEGMENTS * 4),
     segmentParams: new Float32Array(MAX_SEGMENTS * 2),

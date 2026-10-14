@@ -24,9 +24,8 @@ interface Burst {
   start: number;
 }
 
-const PALE = [0.6157, 0.702, 0.7765] as const; // #9DB3C6
-const IVORY = [0.9647, 0.9333, 0.8902] as const; // #F6EEE3
 const FLAME = [0.9412, 0.3529, 0.1098] as const; // #F05A1C, the orange of the bottom right glow
+const AMBER = [0.9529, 0.6039, 0.251] as const; // #F39A40, the hottest bits of the coal
 
 export class EmberSim {
   readonly sparks: Spark[] = [];
@@ -140,10 +139,10 @@ export class EmberSim {
       frame.bursts[i * 4 + 3] = (1 - t) ** 1.2;
     });
 
-    // New sparks: 0 to 3 per frame according to the gesture speed
+    // New sparks: rare, and only at speed (expected count per frame = norm^2 x perFrame, perFrame can be fractional)
     if (this.moved) {
       const norm = clamp(this.speed / p.speed.reference, 0, 1);
-      const born = Math.min(p.sparks.perFrame, Math.floor(norm * p.sparks.perFrame + Math.random()));
+      const born = Math.floor(norm * norm * p.sparks.perFrame + Math.random());
       for (let i = 0; i < born; i++) this.spawn(this.headX, this.headY, 60 + norm * 40, 0);
       this.moved = false;
     }
@@ -160,7 +159,7 @@ export class EmberSim {
       frame.sparks[o] = s.x0 + s.vx * s.age + Math.sin(s.phase + s.age * s.freq) * s.amp * (0.3 + k);
       frame.sparks[o + 1] = s.y0 - s.rise * (1 - (1 - k) * (1 - k));
       frame.sparks[o + 2] = s.size * (1 - 0.45 * k);
-      frame.sparks[o + 3] = (1 - k) ** 1.4 * (0.8 + 0.2 * Math.sin(s.phase * 3 + s.age * 18));
+      frame.sparks[o + 3] = (1 - k) ** 1.4 * (0.8 + 0.2 * Math.sin(s.phase * 3 + s.age * 18)) * 0.75;
       frame.sparks[o + 4] = s.color[0];
       frame.sparks[o + 5] = s.color[1];
       frame.sparks[o + 6] = s.color[2];
@@ -173,8 +172,8 @@ export class EmberSim {
     const s = this.params.sparks;
     if (this.sparks.length >= Math.min(s.max, SPARK_CAPACITY)) this.sparks.shift();
     const distance = Math.random() * spread;
-    // 85 % pale / ivory, 15 % flame orange
-    const color = Math.random() < s.orangeShare ? FLAME : Math.random() < 0.5 ? PALE : IVORY;
+    // Mostly flame orange, a share of amber
+    const color = Math.random() < s.hotShare ? AMBER : FLAME;
     this.sparks.push({
       x0: x + Math.cos(angle) * distance,
       y0: y + Math.sin(angle) * distance,
@@ -185,7 +184,7 @@ export class EmberSim {
       phase: Math.random() * Math.PI * 2,
       life: lerp(s.lifeMin, s.lifeMax, Math.random()),
       age: 0,
-      size: 2 + Math.random() * 3.5,
+      size: 1.6 + Math.random() * 2.4,
       color,
     });
   }
