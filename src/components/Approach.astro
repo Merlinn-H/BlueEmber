@@ -1,5 +1,7 @@
 ---
 // Three numbered steps. Same component on the home page and on Services.
+import { demo } from '../lib/demo';
+
 interface Props {
   tone?: 'default' | 'cool';
   id?: string;
@@ -25,7 +27,7 @@ const steps = [
             <p class="label">{step.number}</p>
             <h3 class="t-h3">{step.title}</h3>
             <p class="approach__text t-muted" data-ember="calm">
-              [À FOURNIR : texte de l'étape, 2 lignes]
+              {demo("[À FOURNIR : texte de l'étape, 2 lignes]", `approach.${step.number}`)}
             </p>
           </li>
         ))

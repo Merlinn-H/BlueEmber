@@ -1,5 +1,4 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
 import Icon from '../components/Icon.astro';
@@ -13,18 +12,21 @@ import ClientsStrip from '../components/ClientsStrip.astro';
 import Testimonial from '../components/Testimonial.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { site } from '../config/site';
+import { getContent } from '../lib/content';
+import { demo } from '../lib/demo';
 import { professionalService } from '../lib/seo';
 
 const byOrder = <T extends { data: { order: number } }>(a: T, b: T) => a.data.order - b.data.order;
-const projects = (await getCollection('projets')).sort(byOrder);
-const services = (await getCollection('services')).sort(byOrder);
-const clients = (await getCollection('clients')).sort(byOrder);
-const testimonial = (await getCollection('temoignages')).sort(byOrder)[0];
+const projects = (await getContent('projets')).sort(byOrder);
+const services = (await getContent('services')).sort(byOrder);
+const clients = (await getContent('clients')).sort(byOrder);
+const testimonial = (await getContent('temoignages')).sort(byOrder)[0];
 
+// Placeholders: shown as made-up figures while the demo mode is on (lib/demo.ts)
 const results = [
-  { value: '[CHIFFRE-1]', label: 'projets livrés' },
-  { value: '[CHIFFRE-2]', label: "ans d'expérience cumulée" },
-  { value: '[CHIFFRE-3]', label: 'de croissance moyenne de [INDICATEUR]' },
+  { value: demo('[CHIFFRE-1]', 'accueil.0'), label: 'projets livrés' },
+  { value: demo('[CHIFFRE-2]', 'accueil.1'), label: "ans d'expérience cumulée" },
+  { value: demo('[CHIFFRE-3]', 'accueil.2'), label: demo('de croissance moyenne de [INDICATEUR]', 'accueil.2') },
 ];
 ---
 

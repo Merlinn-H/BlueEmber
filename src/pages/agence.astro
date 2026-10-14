@@ -1,17 +1,18 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { site } from '../config/site';
+import { getContent } from '../lib/content';
+import { demo } from '../lib/demo';
 import { professionalService } from '../lib/seo';
 
-const team = (await getCollection('equipe')).sort((a, b) => a.data.order - b.data.order);
+const team = (await getContent('equipe')).sort((a, b) => a.data.order - b.data.order);
 const founder = team.find((member) => member.data.founder) ?? team[0];
 
 const values = [
-  { title: 'Luxe', text: '[À FOURNIR : texte sur cette valeur, 2 lignes]' },
-  { title: 'Chaleur', text: '[À FOURNIR : texte sur cette valeur, 2 lignes]' },
-  { title: 'Précision', text: '[À FOURNIR : texte sur cette valeur, 2 lignes]' },
+  { title: 'Luxe', text: demo('[À FOURNIR : texte sur cette valeur, 2 lignes]', 'valeur.luxe') },
+  { title: 'Chaleur', text: demo('[À FOURNIR : texte sur cette valeur, 2 lignes]', 'valeur.chaleur') },
+  { title: 'Précision', text: demo('[À FOURNIR : texte sur cette valeur, 2 lignes]', 'valeur.precision') },
 ];
 ---
 
@@ -26,7 +27,7 @@ const values = [
     <div class="container page-hero__inner">
       <p class="label label--cool" data-reveal>L'agence</p>
       <h1 class="page-hero__title" id="page-title" data-split data-ember="soft">Une équipe<br />à votre service.</h1>
-      <p class="t-lead measure" data-reveal data-ember="calm">[À FOURNIR : chapeau de la page, 2 lignes]</p>
+      <p class="t-lead measure" data-reveal data-ember="calm">{demo('[À FOURNIR : chapeau de la page, 2 lignes]', 'agence.chapeau')}</p>
     </div>
   </section>
 

@@ -1,6 +1,7 @@
 ---
 import LegalLayout from '../layouts/LegalLayout.astro';
 import { site } from '../config/site';
+import { demo } from '../lib/demo';
 import { mailto } from '../lib/placeholders';
 
 const { legal } = site;
@@ -27,12 +28,12 @@ const { legal } = site;
 
   <section aria-labelledby="purposes">
     <h2 id="purposes">Finalités et base légale</h2>
-    <p>[À FOURNIR : finalités et base légale de chaque traitement, 80 à 120 mots]</p>
+    <p>{demo('[À FOURNIR : finalités et base légale de chaque traitement, 80 à 120 mots]', 'confidentialite.finalites')}</p>
   </section>
 
   <section aria-labelledby="retention">
     <h2 id="retention">Durée de conservation</h2>
-    <p>[À FOURNIR : durées de conservation par type de donnée, 40 à 80 mots]</p>
+    <p>{demo('[À FOURNIR : durées de conservation par type de donnée, 40 à 80 mots]', 'confidentialite.duree')}</p>
   </section>
 
   <section aria-labelledby="rights">

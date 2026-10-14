@@ -1,11 +1,11 @@
 ---
-import { getCollection } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Button from '../../components/Button.astro';
 import ProjectCard from '../../components/ProjectCard.astro';
 import ContactCta from '../../components/ContactCta.astro';
+import { getContent } from '../../lib/content';
 
-const projects = (await getCollection('projets')).sort((a, b) => a.data.order - b.data.order);
+const projects = (await getContent('projets')).sort((a, b) => a.data.order - b.data.order);
 
 const filters = [
   { value: 'all', label: 'Tous' },

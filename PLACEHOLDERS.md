@@ -2,12 +2,16 @@
 
 Fichier généré par `npm run placeholders:check`. Ne pas éditer à la main.
 
-- Textes entre crochets : 208 occurrences dans 26 fichiers (163 uniques par fichier)
+- Textes entre crochets : 211 occurrences dans 27 fichiers (166 uniques par fichier)
 - Images placeholders référencées : 69
 - Assets de marque à fournir : 3
 
 Remplacer un texte : modifier la valeur dans le fichier indiqué. Remplacer une image : déposer le fichier réel dans `public/`
 (par exemple `public/images/`), puis changer le chemin dans le front-matter du contenu concerné.
+
+Mode démo : tant que `PUBLIC_DEMO_CONTENT` n'est pas à `0`, le site affiche ces placeholders de contenu en lorem ipsum et en faux
+chiffres (voir `src/lib/demo.ts`) et reste en noindex. Les textes réels ne sont jamais modifiés. La ville, les coordonnées et les
+informations légales restent affichées entre crochets.
 
 ## Assets de marque et de scène
 
@@ -102,52 +106,59 @@ Remplacer un texte : modifier la valeur dans le fichier indiqué. Remplacer une 
 
 ## Textes
 
+### `src/components/Approach.astro`
+
+| Ligne | Placeholder | Contenu attendu |
+|---|---|---|
+| 30 | `[À FOURNIR : texte de l'étape, 2 lignes]` | Texte de 2 lignes (≈ 90 caractères) |
+
 ### `src/components/ContactForm.astro`
 
 | Ligne | Placeholder | Contenu attendu |
 |---|---|---|
-| 7 | `[< 5 k€]` | Fourchette de budget (libellé de la liste) |
-| 8 | `[5 à 15 k€]` | Fourchette de budget (libellé de la liste) |
-| 9 | `[15 à 40 k€]` | Fourchette de budget (libellé de la liste) |
-| 10 | `[> 40 k€]` | Fourchette de budget (libellé de la liste) |
-| 47 | `[À FOURNIR : texte du consentement RGPD]` | Texte à fournir (voir la description entre crochets) |
+| 8 | `[< 5 k€]` | Fourchette de budget (libellé de la liste) |
+| 9 | `[5 à 15 k€]` | Fourchette de budget (libellé de la liste) |
+| 10 | `[15 à 40 k€]` | Fourchette de budget (libellé de la liste) |
+| 11 | `[> 40 k€]` | Fourchette de budget (libellé de la liste) |
+| 48 | `[À FOURNIR : texte du consentement RGPD]` | Texte à fournir (voir la description entre crochets) |
 
 ### `src/components/Newsletter.astro`
 
 | Ligne | Placeholder | Contenu attendu |
 |---|---|---|
-| 26 | `[À FOURNIR : texte de consentement à la newsletter]` | Texte à fournir (voir la description entre crochets) |
+| 27 | `[À FOURNIR : texte de consentement à la newsletter]` | Texte à fournir (voir la description entre crochets) |
 
 ### `src/config/faq.ts`
 
 | Ligne | Placeholder | Contenu attendu |
 |---|---|---|
-| 4 | `[À FOURNIR : réponse sur les délais, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
-| 5 | `[À FOURNIR : réponse sur le budget, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
-| 7 | `[À FOURNIR : réponse sur la zone géographique, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
-| 8 | `[À FOURNIR : réponse sur la propriété des contenus, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
-| 9 | `[À FOURNIR : réponse sur le suivi après livraison, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
+| 6 | `[À FOURNIR : réponse sur les délais, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
+| 7 | `[À FOURNIR : réponse sur le budget, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
+| 8 | `[À FOURNIR : réponse sur le déroulé d\'un projet, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
+| 9 | `[À FOURNIR : réponse sur la zone géographique, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
+| 10 | `[À FOURNIR : réponse sur la propriété des contenus, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
+| 11 | `[À FOURNIR : réponse sur le suivi après livraison, 2 à 3 phrases]` | Texte à fournir (voir la description entre crochets) |
 
 ### `src/config/site.ts`
 
 | Ligne | Placeholder | Contenu attendu |
 |---|---|---|
-| 11 | `[VILLE]` | Nom de la ville de l'agence |
-| 12 | `[EMAIL]` | Adresse e-mail de contact |
-| 13 | `[TÉLÉPHONE]` | Numéro, format international (ex. +33 1 23 45 67 89) |
-| 14 | `[ADRESSE]` | Adresse postale complète |
-| 15 | `[DÉLAI]` | Durée de réponse (ex. 24 heures ouvrées) |
-| 17 | `[INSTAGRAM]` | URL complète du profil (https://...) |
-| 18 | `[LINKEDIN]` | URL complète du profil (https://...) |
-| 44 | `[VIDEO-HERO]` | Vidéo MP4 H.264 de 6 à 12 s en boucle, 8 Mo max, + version mobile 3 Mo max |
-| 53 | `[RAISON SOCIALE]` | Information légale exacte (Kbis) |
-| 54 | `[FORME]` | Information légale exacte (Kbis) |
-| 55 | `[CAPITAL]` | Information légale exacte (Kbis) |
-| 56 | `[SIREN]` | Information légale exacte (Kbis) |
-| 57 | `[ADRESSE]` | Adresse postale complète |
-| 58 | `[DIRECTEUR DE PUBLICATION]` | Information légale exacte (Kbis) |
-| 59 | `[HÉBERGEUR]` | Information légale exacte (Kbis) |
-| 60 | `[EMAIL-DPO]` | Adresse e-mail du délégué à la protection des données |
+| 13 | `[VILLE]` | Nom de la ville de l'agence |
+| 14 | `[EMAIL]` | Adresse e-mail de contact |
+| 15 | `[TÉLÉPHONE]` | Numéro, format international (ex. +33 1 23 45 67 89) |
+| 16 | `[ADRESSE]` | Adresse postale complète |
+| 17 | `[DÉLAI]` | Durée de réponse (ex. 24 heures ouvrées) |
+| 19 | `[INSTAGRAM]` | URL complète du profil (https://...) |
+| 20 | `[LINKEDIN]` | URL complète du profil (https://...) |
+| 46 | `[VIDEO-HERO]` | Vidéo MP4 H.264 de 6 à 12 s en boucle, 8 Mo max, + version mobile 3 Mo max |
+| 55 | `[RAISON SOCIALE]` | Information légale exacte (Kbis) |
+| 56 | `[FORME]` | Information légale exacte (Kbis) |
+| 57 | `[CAPITAL]` | Information légale exacte (Kbis) |
+| 58 | `[SIREN]` | Information légale exacte (Kbis) |
+| 59 | `[ADRESSE]` | Adresse postale complète |
+| 60 | `[DIRECTEUR DE PUBLICATION]` | Information légale exacte (Kbis) |
+| 61 | `[HÉBERGEUR]` | Information légale exacte (Kbis) |
+| 62 | `[EMAIL-DPO]` | Adresse e-mail du délégué à la protection des données |
 
 ### `src/content/equipe/equipe-01.md`
 
@@ -406,37 +417,38 @@ Remplacer un texte : modifier la valeur dans le fichier indiqué. Remplacer une 
 
 | Ligne | Placeholder | Contenu attendu |
 |---|---|---|
-| 12 | `[À FOURNIR : texte sur cette valeur, 2 lignes]` | Texte de 2 lignes (≈ 90 caractères) |
 | 13 | `[À FOURNIR : texte sur cette valeur, 2 lignes]` | Texte de 2 lignes (≈ 90 caractères) |
 | 14 | `[À FOURNIR : texte sur cette valeur, 2 lignes]` | Texte de 2 lignes (≈ 90 caractères) |
-| 29 | `[À FOURNIR : chapeau de la page, 2 lignes]` | Texte de 2 lignes (≈ 90 caractères) |
+| 15 | `[À FOURNIR : texte sur cette valeur, 2 lignes]` | Texte de 2 lignes (≈ 90 caractères) |
+| 30 | `[À FOURNIR : chapeau de la page, 2 lignes]` | Texte de 2 lignes (≈ 90 caractères) |
 
 ### `src/pages/confidentialite.astro`
 
 | Ligne | Placeholder | Contenu attendu |
 |---|---|---|
-| 30 | `[À FOURNIR : finalités et base légale de chaque traitement, 80 à 120 mots]` | Texte de 80 à 120 mots |
-| 35 | `[À FOURNIR : durées de conservation par type de donnée, 40 à 80 mots]` | Texte de 40 à 80 mots |
+| 31 | `[À FOURNIR : finalités et base légale de chaque traitement, 80 à 120 mots]` | Texte de 80 à 120 mots |
+| 36 | `[À FOURNIR : durées de conservation par type de donnée, 40 à 80 mots]` | Texte de 40 à 80 mots |
 
 ### `src/pages/index.astro`
 
 | Ligne | Placeholder | Contenu attendu |
 |---|---|---|
-| 25 | `[CHIFFRE-1]` | Nombre seul (ex. 120) : il est compté à l'apparition |
-| 26 | `[CHIFFRE-2]` | Nombre seul (ex. 120) : il est compté à l'apparition |
-| 27 | `[CHIFFRE-3]` | Nombre seul (ex. 120) : il est compté à l'apparition |
-| 27 | `[INDICATEUR]` | Nom de l'indicateur (ex. chiffre d'affaires) |
+| 27 | `[CHIFFRE-1]` | Nombre seul (ex. 120) : il est compté à l'apparition |
+| 28 | `[CHIFFRE-2]` | Nombre seul (ex. 120) : il est compté à l'apparition |
+| 29 | `[CHIFFRE-3]` | Nombre seul (ex. 120) : il est compté à l'apparition |
+| 29 | `[INDICATEUR]` | Nom de l'indicateur (ex. chiffre d'affaires) |
 
 ### `src/pages/mentions-legales.astro`
 
 | Ligne | Placeholder | Contenu attendu |
 |---|---|---|
-| 50 | `[À FOURNIR : finalités des traitements, 60 à 100 mots]` | Texte de 60 à 100 mots |
-| 51 | `[À FOURNIR : durée de conservation des données, 40 à 80 mots]` | Texte de 40 à 80 mots |
+| 46 | `[À FOURNIR : clause de propriété intellectuelle (textes, images, vidéos, marques), 80 à 120 mots]` | Texte de 80 à 120 mots |
+| 51 | `[À FOURNIR : finalités des traitements, 60 à 100 mots]` | Texte de 60 à 100 mots |
+| 52 | `[À FOURNIR : durée de conservation des données, 40 à 80 mots]` | Texte de 40 à 80 mots |
 
 ### `src/pages/services.astro`
 
 | Ligne | Placeholder | Contenu attendu |
 |---|---|---|
-| 29 | `[À FOURNIR : chapeau de la page, 2 lignes]` | Texte de 2 lignes (≈ 90 caractères) |
+| 30 | `[À FOURNIR : chapeau de la page, 2 lignes]` | Texte de 2 lignes (≈ 90 caractères) |
 

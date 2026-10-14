@@ -6,6 +6,7 @@ interface ImportMetaEnv {
   readonly PUBLIC_BOOKING_URL?: string;
   readonly PUBLIC_ANALYTICS_DOMAIN?: string;
   readonly PUBLIC_ANALYTICS_SRC?: string;
+  readonly PUBLIC_DEMO_CONTENT?: string;
 }
 
 interface ImportMeta {

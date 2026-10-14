@@ -72,6 +72,7 @@ Variables d'environnement (`.env`, modèle dans `.env.example`) :
 - `PUBLIC_FORM_ENDPOINT` : reçoit le formulaire de contact et la newsletter en JSON (Formspree, Getform, Netlify, API maison). Vide : succès simulé en développement, échec propre en production.
 - `PUBLIC_BOOKING_URL` : lien Calendly ou équivalent. Vide : le bouton « Réserver un créneau » est masqué.
 - `PUBLIC_ANALYTICS_DOMAIN` : mesure d'audience Plausible, sans cookie. Vide : désactivée. Aucun bandeau cookies n'est nécessaire en V1.
+- `PUBLIC_DEMO_CONTENT` : mode démo, actif tant que la valeur n'est pas `0`. Les placeholders de contenu qui restent s'affichent en lorem ipsum et en faux chiffres (`src/lib/demo.ts`), et le site est servi en noindex (balise meta et `robots.txt`) puisque les chiffres et les noms sont inventés. Rien n'est écrit dans les fichiers : les placeholders restent dans les sources, donc `npm run placeholders:check` dit toujours ce qu'il reste à fournir. Les textes réels ne sont jamais touchés ; la ville, les coordonnées et les informations légales restent entre crochets. Mettre `0` pour publier avec du vrai contenu.
 
 ## La braise
 

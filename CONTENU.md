@@ -10,6 +10,7 @@ Tous les textes du site, page par page, dans l'ordre où le visiteur les lit. Do
 4. Dans les titres, le signe `/` marque un retour à la ligne : `Votre marque / mérite / de briller.` s'affiche sur trois lignes.
 5. Les images, vidéos et logos ne sont pas dans ce document : voir `PLACEHOLDERS.md`.
 6. Chaque section indique le fichier du site concerné. Une fois ce document rempli, les textes sont reportés dans le site sans toucher à la mise en page.
+7. Le site affiche aujourd'hui du lorem ipsum et de faux chiffres à la place des placeholders (mode démo, variable `PUBLIC_DEMO_CONTENT`). La colonne « Texte actuel » montre ce qu'il y a dans les fichiers, pas ce qui s'affiche. La ville, les coordonnées et les informations légales restent entre crochets.
 
 Ton éditorial (rappel du brief) : on vouvoie, phrases courtes et affirmatives, pas de jargon (« plus de clients », pas « optimisation du funnel »), pas d'emoji, pas de point d'exclamation. Titres courts, en lignes de deux ou trois mots.
 

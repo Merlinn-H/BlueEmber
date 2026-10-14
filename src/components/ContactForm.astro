@@ -2,12 +2,13 @@
 import Field from './Field.astro';
 import Button from './Button.astro';
 import { site } from '../config/site';
+import { demo } from '../lib/demo';
 
 const budgets = [
-  { value: 'lt-5k', label: '[< 5 k€]' },
-  { value: '5-15k', label: '[5 à 15 k€]' },
-  { value: '15-40k', label: '[15 à 40 k€]' },
-  { value: 'gt-40k', label: '[> 40 k€]' },
+  { value: 'lt-5k', label: demo('[< 5 k€]') },
+  { value: '5-15k', label: demo('[5 à 15 k€]') },
+  { value: '15-40k', label: demo('[15 à 40 k€]') },
+  { value: 'gt-40k', label: demo('[> 40 k€]') },
   { value: 'unknown', label: 'Je ne sais pas encore' },
 ];
 ---
@@ -44,7 +45,7 @@ const budgets = [
     <div class="field" data-field data-required-message="Pour envoyer le formulaire, acceptez le traitement de vos données.">
       <label class="check" for="f-consent">
         <input type="checkbox" id="f-consent" name="consent" required aria-describedby="f-consent-error" />
-        <span>[À FOURNIR : texte du consentement RGPD]</span>
+        <span>{demo('[À FOURNIR : texte du consentement RGPD]', 'consent.contact')}</span>
       </label>
       <p class="field__error t-small" id="f-consent-error" data-error></p>
     </div>

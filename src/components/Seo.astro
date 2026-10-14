@@ -1,5 +1,6 @@
 ---
 import { site } from '../config/site';
+import { demoEnabled } from '../lib/demo';
 
 interface Props {
   title: string;
@@ -21,7 +22,8 @@ const image = new URL(`/og/${ogImage}.png`, origin).href;
 <title>{title}</title>
 <meta name="description" content={description} />
 <link rel="canonical" href={canonical} />
-{noindex && <meta name="robots" content="noindex" />}
+{/* Demo mode: the figures and names are made up, search engines must not index them */}
+{demoEnabled ? <meta name="robots" content="noindex, nofollow" /> : noindex && <meta name="robots" content="noindex" />}
 
 <meta property="og:site_name" content={site.name} />
 <meta property="og:type" content={type} />

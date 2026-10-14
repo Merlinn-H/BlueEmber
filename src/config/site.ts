@@ -1,5 +1,7 @@
 // Centralised site settings. Everything in square brackets is a placeholder to replace
 // (the list is generated in PLACEHOLDERS.md by `npm run placeholders:check`).
+import { demo } from '../lib/demo';
+
 const env = import.meta.env;
 
 export const site = {
@@ -12,7 +14,7 @@ export const site = {
   email: '[EMAIL]',
   phone: '[TÉLÉPHONE]',
   address: '[ADRESSE]',
-  responseDelay: '[DÉLAI]',
+  responseDelay: demo('[DÉLAI]', 'delai'),
   social: {
     instagram: '[INSTAGRAM]',
     linkedin: '[LINKEDIN]',

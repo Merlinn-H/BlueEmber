@@ -12,10 +12,22 @@ import { FORMATS, OG_REAL, buildSlots, ogPages } from './lib/slots.mjs';
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const warnOnly = process.argv.includes('--warn');
 
+// Demo mode (src/lib/demo.ts) is on unless PUBLIC_DEMO_CONTENT=0, in the environment or in .env
+function readEnv(name) {
+  if (process.env[name] !== undefined) return process.env[name];
+  const file = join(root, '.env');
+  if (!existsSync(file)) return undefined;
+  const line = readFileSync(file, 'utf8')
+    .split(/\r?\n/)
+    .find((entry) => entry.startsWith(`${name}=`));
+  return line?.slice(name.length + 1).trim();
+}
+const demoOn = readEnv('PUBLIC_DEMO_CONTENT') !== '0';
+
 const SCAN_DIRS = ['src/config', 'src/content', 'src/pages', 'src/components', 'src/layouts'];
 const TEXT_EXT = new Set(['.astro', '.ts', '.md', '.mdx', '.json']);
 
-const BRACKET = /\[(?=[^\]\n]*[A-ZÀ-ÝÉ]{2})[^[\]\n'"`{}()=;]*\]|\[[<>]?\s?\d+(?:\s?à\s?\d+)?\s?k€\]/g;
+const BRACKET = /\[(?=[^\]\n]*[A-ZÀ-ÝÉ]{2})[^[\]\n"`{}=;]*\]|\[[<>]?\s?\d+(?:\s?à\s?\d+)?\s?k€\]/g;
 
 // What the real content should look like, by placeholder code
 const KNOWN = [
@@ -142,6 +154,12 @@ if (warnOnly) {
   } else {
     console.log('[placeholders] aucun placeholder restant.');
   }
+  if (demoOn) {
+    console.warn(
+      "[démo] Mode démo actif : les placeholders de contenu s'affichent en lorem ipsum et en faux chiffres, et le site est servi en noindex. " +
+        'Pour publier avec du vrai contenu : renseigner les textes, puis PUBLIC_DEMO_CONTENT=0.\n',
+    );
+  }
   process.exit(0);
 }
 
@@ -157,6 +175,10 @@ Fichier généré par \`npm run placeholders:check\`. Ne pas éditer à la main.
 
 Remplacer un texte : modifier la valeur dans le fichier indiqué. Remplacer une image : déposer le fichier réel dans \`public/\`
 (par exemple \`public/images/\`), puis changer le chemin dans le front-matter du contenu concerné.
+
+Mode démo : tant que \`PUBLIC_DEMO_CONTENT\` n'est pas à \`0\`, le site affiche ces placeholders de contenu en lorem ipsum et en faux
+chiffres (voir \`src/lib/demo.ts\`) et reste en noindex. Les textes réels ne sont jamais modifiés. La ville, les coordonnées et les
+informations légales restent affichées entre crochets.
 
 ## Assets de marque et de scène
 

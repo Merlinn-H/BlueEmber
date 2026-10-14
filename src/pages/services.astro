@@ -1,5 +1,4 @@
 ---
-import { getCollection, getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Button from '../components/Button.astro';
 import Approach from '../components/Approach.astro';
@@ -7,11 +6,13 @@ import Faq from '../components/Faq.astro';
 import ContactCta from '../components/ContactCta.astro';
 import { faq } from '../config/faq';
 import { faqPage } from '../lib/seo';
+import { getContent, getContentEntry } from '../lib/content';
+import { demo } from '../lib/demo';
 import { site } from '../config/site';
 
-const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const services = (await getContent('services')).sort((a, b) => a.data.order - b.data.order);
 const related = await Promise.all(
-  services.map(async (service) => (service.data.relatedProject ? await getEntry(service.data.relatedProject) : undefined)),
+  services.map(async (service) => (service.data.relatedProject ? await getContentEntry(service.data.relatedProject) : undefined)),
 );
 ---
 
@@ -26,7 +27,7 @@ const related = await Promise.all(
     <div class="container page-hero__inner">
       <p class="label label--cool" data-reveal>Services</p>
       <h1 class="page-hero__title" id="page-title" data-split data-ember="soft">Ce que nous<br />faisons pour vous.</h1>
-      <p class="t-lead measure" data-reveal data-ember="calm">[À FOURNIR : chapeau de la page, 2 lignes]</p>
+      <p class="t-lead measure" data-reveal data-ember="calm">{demo('[À FOURNIR : chapeau de la page, 2 lignes]', 'services.chapeau')}</p>
     </div>
   </section>
 
@@ -179,9 +180,12 @@ const related = await Promise.all(
 
     .faq-layout > :first-child {
       grid-column: 1 / span 4;
+      /* Label and title stay together at the top instead of spreading over the height of the list */
+      align-content: start;
     }
 
-    .faq-layout > :last-child {
+    /* The list is a child component: its root does not carry this page's style scope, hence :global() */
+    .faq-layout > :global(.faq) {
       grid-column: 6 / span 7;
     }
   }

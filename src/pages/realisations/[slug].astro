@@ -1,5 +1,4 @@
 ---
-import { getCollection, getEntries, getEntry } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import Video from '../../components/Video.astro';
@@ -7,10 +6,11 @@ import Results from '../../components/Results.astro';
 import Testimonial from '../../components/Testimonial.astro';
 import ContactCta from '../../components/ContactCta.astro';
 import { emberPages } from '../../config/ember';
+import { getContent, getContentEntries, getContentEntry } from '../../lib/content';
 import { breadcrumb, creativeWork } from '../../lib/seo';
 
 export async function getStaticPaths() {
-  const projects = (await getCollection('projets')).sort((a, b) => a.data.order - b.data.order);
+  const projects = (await getContent('projets')).sort((a, b) => a.data.order - b.data.order);
   return projects.map((project, index) => ({
     params: { slug: project.id },
     props: { project, next: projects[(index + 1) % projects.length] },
@@ -25,8 +25,8 @@ interface Props {
 const { project, next } = Astro.props;
 const { title, client, year, sector, summary, hero, video, context, challenge, solution, solutionImages, results, gallery, credits } =
   project.data;
-const testimonial = project.data.testimonial ? await getEntry(project.data.testimonial) : undefined;
-const services = await getEntries(project.data.services);
+const testimonial = project.data.testimonial ? await getContentEntry(project.data.testimonial) : undefined;
+const services = await getContentEntries(project.data.services);
 
 const origin = Astro.site!.origin;
 const url = `${origin}/realisations/${project.id}`;

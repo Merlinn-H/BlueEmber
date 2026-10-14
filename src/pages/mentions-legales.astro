@@ -1,6 +1,7 @@
 ---
 import LegalLayout from '../layouts/LegalLayout.astro';
 import { site } from '../config/site';
+import { demo } from '../lib/demo';
 import { mailto } from '../lib/placeholders';
 
 const { legal } = site;
@@ -42,13 +43,13 @@ const { legal } = site;
 
   <section aria-labelledby="ip">
     <h2 id="ip">Propriété intellectuelle</h2>
-    <p>[À FOURNIR : clause de propriété intellectuelle (textes, images, vidéos, marques), 80 à 120 mots]</p>
+    <p>{demo('[À FOURNIR : clause de propriété intellectuelle (textes, images, vidéos, marques), 80 à 120 mots]', 'mentions.pi')}</p>
   </section>
 
   <section aria-labelledby="data">
     <h2 id="data">Données personnelles</h2>
-    <p>[À FOURNIR : finalités des traitements, 60 à 100 mots]</p>
-    <p>[À FOURNIR : durée de conservation des données, 40 à 80 mots]</p>
+    <p>{demo('[À FOURNIR : finalités des traitements, 60 à 100 mots]', 'mentions.finalites')}</p>
+    <p>{demo('[À FOURNIR : durée de conservation des données, 40 à 80 mots]', 'mentions.duree')}</p>
     <p>
       Vous disposez d'un droit d'accès, de rectification, d'effacement, d'opposition et de portabilité. Pour l'exercer :
       <a href={mailto(legal.dpoEmail)}>{legal.dpoEmail}</a>. Plus de détails dans la
