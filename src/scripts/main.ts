@@ -30,17 +30,23 @@ if (finePointer()) lazyPage('[data-magnetic]', () => import('./motion/buttons'))
 
 // Desktop pointer niceties and the ember effect start once the page is idle, and the preloader waits for
 // the ember (shaders compiled), up to its 1.5 s ceiling. On touch devices the ember starts on the first
-// touch or scroll instead, and the preloader does not wait for it: creating a WebGL context is the heaviest
-// single call of the page (very slow on software rendering, as in PageSpeed Insights) and a phone only needs
-// the effect once someone touches it.
+// touch, scroll or mouse move instead, and the preloader does not wait for it: creating a WebGL context is
+// the heaviest single call of the page (very slow on software rendering, as in PageSpeed Insights) and a phone
+// only needs the effect once someone touches it. The mouse counts because some browsers and some hybrid
+// laptops report a coarse pointer while a mouse is in use: the effect must not wait for a click there.
 const firstInteraction = (): Promise<void> =>
   new Promise((resolve) => {
     const events = ['touchstart', 'pointerdown', 'scroll', 'keydown'];
+    const onMove = (event: PointerEvent) => {
+      if (event.pointerType === 'mouse') done();
+    };
     const done = () => {
       for (const name of events) window.removeEventListener(name, done);
+      window.removeEventListener('pointermove', onMove);
       resolve();
     };
     for (const name of events) window.addEventListener(name, done, { passive: true });
+    window.addEventListener('pointermove', onMove, { passive: true });
   });
 
 const desktop = finePointer();

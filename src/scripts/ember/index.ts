@@ -2,7 +2,7 @@ import { emberDefaults, type EmberParams } from '../../config/ember';
 import { finePointer, mqReduce, reduced, saveData } from '../lib/env';
 import { onPage } from '../lib/lifecycle';
 import { createLoop } from '../lib/loop';
-import { damp } from '../lib/math';
+import { clamp, damp } from '../lib/math';
 import { onCurtainClosed } from '../motion/transitions';
 import { Canvas2DRenderer } from './canvas2d';
 import { FragmentTracker } from './fragment';
@@ -14,10 +14,12 @@ import { ZoneTracker } from './zones';
 // "The ember that reveals itself" (brief 7). One persistent canvas for the whole site.
 //
 // Tiers, decided at start (7.7): prefers-reduced-motion or data saver -> static (Ambiance + fragment only);
-// WebGL2 -> webgl; otherwise -> canvas2d; if that fails too -> static. If the frame rate stays under
-// 45 fps for 2 s the render resolution drops to 0.35x, then the effect moves to canvas2d.
+// WebGL2 on a real GPU -> webgl; otherwise (no WebGL, or software rendering) -> canvas2d; if that fails too -> static.
+// If the frame rate stays under 45 fps for 2 s the render resolution drops to 0.35x, then the effect moves to
+// canvas2d. "Under 45" is relative to what the browser allows: a requestAnimationFrame capped at 30 fps (battery
+// saver, slow screen) is not a slow GPU, so the floor is 75 % of the measured refresh rate when that is lower.
 // The render loop stops by itself when the trail is out, no spark is alive and nothing moved for 2.5 s:
-// at rest the GPU does no work at all.
+// at rest the GPU does no work at all. The current tier is mirrored in data-ember-tier on the stage.
 
 export interface EmberApi {
   readonly params: EmberParams;
@@ -44,6 +46,35 @@ export const getEmber = (): EmberApi | null => api;
 
 const INTERACTIVE = 'a, button, input, textarea, select, summary, label, [role="button"], [data-cursor]';
 
+/**
+ * The frame rate the browser really allows, from the quickest frames over a short window (a busy start-up stretches
+ * some of them). Resolves to 60 when no frame comes (hidden tab).
+ */
+function measureRefreshRate(): Promise<number> {
+  return new Promise((resolve) => {
+    const gaps: number[] = [];
+    let last = 0;
+    let finished = false;
+    const finish = () => {
+      if (finished) return;
+      finished = true;
+      if (gaps.length < 4) return resolve(60);
+      gaps.sort((a, b) => a - b);
+      const best = gaps.slice(0, Math.max(2, gaps.length >> 2));
+      resolve(clamp(1000 / (best.reduce((sum, gap) => sum + gap, 0) / best.length), 24, 240));
+    };
+    const tick = (now: number) => {
+      if (finished) return;
+      if (last) gaps.push(now - last);
+      last = now;
+      if (gaps.length < 16) requestAnimationFrame(tick);
+      else finish();
+    };
+    requestAnimationFrame(tick);
+    window.setTimeout(finish, 1200);
+  });
+}
+
 async function loadCracks(url: string | undefined): Promise<HTMLImageElement | null> {
   if (!url) return null;
   try {
@@ -63,6 +94,8 @@ export function initEmber(): EmberHandle | null {
   if (!stage || !firstCanvas) return null;
 
   let canvas = firstCanvas;
+  // ?debug: the tuning panel, window.__ember, and WebGL even on software rendering (the checks run on SwiftShader)
+  const debug = new URLSearchParams(window.location.search).has('debug');
   const params: EmberParams = structuredClone(emberDefaults);
   const frame = createFrameData(params);
   // The cool glow of the Ambiance is attenuated in CSS; the pile has to let exactly that much of it show through
@@ -98,6 +131,14 @@ export function initEmber(): EmberHandle | null {
   let fpsTime = 0;
   let fpsFrames = 0;
   let warmup = 0;
+  // What the browser allows, measured at start (see measureRefreshRate)
+  let refreshHz = 60;
+  const fpsFloor = () => Math.min(params.render.fpsFloor, refreshHz * 0.75);
+
+  const useTier = (next: EmberTier) => {
+    tier = next;
+    stage.dataset.emberTier = next;
+  };
 
   // --- Renderer lifecycle ----------------------------------------------------------------------
   // A canvas cannot switch context type, so every renderer gets a fresh element.
@@ -110,7 +151,9 @@ export function initEmber(): EmberHandle | null {
     canvas.replaceWith(next);
     canvas = next;
 
-    const candidate = kind === 'webgl' ? WebGLRenderer.create(canvas) : Canvas2DRenderer.create(canvas);
+    // Software WebGL (no GPU, remote desktop, blocklisted driver) is refused: the shader would stutter the whole page
+    // until the watchdog gave up, and the 2D tier does better there
+    const candidate = kind === 'webgl' ? WebGLRenderer.create(canvas, !debug) : Canvas2DRenderer.create(canvas);
     if (!candidate) return false;
     // Creating the context is the heaviest single call: keep it in a task of its own
     await new Promise<void>((resolve) => setTimeout(resolve, 0));
@@ -124,20 +167,22 @@ export function initEmber(): EmberHandle | null {
     }
     if (candidate instanceof WebGLRenderer) candidate.onContextLost = () => void downgrade();
     renderer = candidate;
-    tier = kind;
+    useTier(kind);
     return true;
   }
 
   async function boot(): Promise<void> {
     if (reduced() || saveData()) {
-      tier = 'static';
+      useTier('static');
       return;
     }
+    // Measured while the renderer is built; the watchdog only reads it after its first 2 s window
+    void measureRefreshRate().then((hz) => (refreshHz = hz));
     const [mask, cracks] = await Promise.all([fragment.loadMask(), loadCracks(stage?.dataset.cracks)]);
     assets = { mask, cracks };
     if (await build('webgl')) return;
     if (await build('canvas2d')) return;
-    tier = 'static';
+    useTier('static');
   }
 
   function goStatic(): void {
@@ -145,7 +190,7 @@ export function initEmber(): EmberHandle | null {
     renderer?.clear();
     renderer?.destroy();
     renderer = null;
-    tier = 'static';
+    useTier('static');
   }
 
   async function downgrade(): Promise<void> {
@@ -198,7 +243,7 @@ export function initEmber(): EmberHandle | null {
         fps = fpsFrames / fpsTime;
         fpsTime = 0;
         fpsFrames = 0;
-        if (fps < params.render.fpsFloor && state.autoQuality) void lowerQuality();
+        if (fps < fpsFloor() && state.autoQuality) void lowerQuality();
       }
     }
 
@@ -240,7 +285,7 @@ export function initEmber(): EmberHandle | null {
       return;
     }
     // canvas2d is the last tier: it only gives way to the static scene when frames are really bad
-    if (fps < 30) goStatic();
+    if (fps < Math.min(30, refreshHz * 0.5)) goStatic();
   }
 
   // --- Input ---------------------------------------------------------------------------------------
@@ -379,7 +424,13 @@ export function initEmber(): EmberHandle | null {
     renderer?.clear();
   });
 
-  const ready = boot();
+  // On a phone the effect is built at the first touch, while the hero is already visible: the loop is woken and kept alive
+  // long enough for the idle breathing to take over (it starts 1.5 s after the last touch), without waiting for a second
+  // touch or scroll
+  const ready = boot().then(() => {
+    if (!finePointer()) sim.lastInput = performance.now();
+    wake();
+  });
 
   const state = {
     autoQuality: true,
@@ -422,7 +473,7 @@ export function initEmber(): EmberHandle | null {
     wake,
   };
 
-  if (new URLSearchParams(window.location.search).has('debug')) {
+  if (debug) {
     // window.__ember is a handle for the console and for automated checks
     Object.assign(window, { __ember: api });
     void import('./debug').then((module) => api && module.mountDebug(api));

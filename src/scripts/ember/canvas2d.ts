@@ -1,3 +1,4 @@
+import { emberDefaults } from '../../config/ember';
 import { SPARK_STRIDE, type EmberRenderer, type FrameData, type RendererAssets } from './types';
 
 // Intermediate tier (brief 7.7): 2D canvas with a pre-generated texture (pile of charcoal and wood, glowing gaps)
@@ -107,6 +108,26 @@ function makeCracksTexture(size = 384, cells = 6): HTMLCanvasElement {
   const stops = [[77, 16, 9], [199, 38, 16], [240, 90, 28], [243, 154, 64]];
   const crustAlpha = 204;
 
+  // The palette of the shader (src/scripts/ember/shaders.ts): warm brown lit by the heat, blue-black steel lit by the cold
+  // light of the Ambiance. `cool` is look.cool, 0 gives the warm brown pile.
+  const cool = emberDefaults.look.cool;
+  const blend = (from: number[], to: number[]) => from.map((v, k) => v + (to[k] - v) * cool);
+  const scale = (v: number[], s: number) => v.map((c) => c * s);
+  const coalBase = blend([0.034, 0.03, 0.028], [0.027, 0.031, 0.042]);
+  const keyWarm = scale([0.12, 0.074, 0.054], 1 - 0.45 * cool);
+  const keyCool = scale([0.056, 0.084, 0.124], cool);
+  const sheenWarm = scale([0.19, 0.12, 0.085], 1 - 0.35 * cool);
+  const sheenCool = scale([0.105, 0.155, 0.235], cool);
+  const woodChar = blend([0.03, 0.025, 0.022], [0.025, 0.026, 0.031]);
+  const woodFibre = [0.2, 0.112, 0.066];
+  const rimWarm1 = scale([0.19, 0.115, 0.08], 1 - 0.5 * cool);
+  const rimCool1 = scale([0.1, 0.148, 0.22], cool);
+  const rimWarm2 = scale([0.085, 0.052, 0.038], 1 - 0.5 * cool);
+  const rimCool2 = scale([0.046, 0.068, 0.1], cool);
+  const coal = [0, 0, 0];
+  const wood = [0, 0, 0];
+  const lit = [0, 0, 0];
+
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
       // Sine warp (whole cycles over the texture, so it still tiles): the gaps wander like fissures, not like glass
@@ -134,12 +155,10 @@ function makeCracksTexture(size = 384, cells = 6): HTMLCanvasElement {
       const sc = Math.pow(Math.max(nx * H[0] + ny * H[1] + nz * H[2], 0), 40) * (hash(b.id, b.jd, 7) > 0.62 ? 1 : 0);
       const pits = 1 - 0.4 * smoothstep(0.62, 0.8, vnoise(px / 1.6, py / 1.6, size / 1.6, 5));
       const ao2 = 0.72 + 0.28 * smoothstep(0, 0.1, edge2);
-      // Warm light of the heat, baked at 80 %
-      const coal = [
-        (0.034 + (0.12 * dc + 0.19 * sc) * 0.8) * pits * ao2,
-        (0.03 + (0.074 * dc + 0.12 * sc) * 0.8) * pits * ao2,
-        (0.028 + (0.054 * dc + 0.085 * sc) * 0.8) * pits * ao2,
-      ];
+      // Warm light of the heat and cold steel light of the Ambiance, both baked at 80 %
+      for (let k = 0; k < 3; k++) {
+        coal[k] = (coalBase[k] + ((keyWarm[k] + keyCool[k]) * dc + (sheenWarm[k] + sheenCool[k]) * sc) * 0.8) * pits * ao2;
+      }
 
       // Wood: a log in the cell, cylinder lighting, brown fibres on black char, cracks across and along the grain
       const ang = hash(a.id, a.jd, 4) * Math.PI;
@@ -159,7 +178,7 @@ function makeCracksTexture(size = 384, cells = 6): HTMLCanvasElement {
       const lc = Math.abs(frac(across * 3.6 + 0.25 * vnoise(along * 3, a.jd * 2.9, 65536, 10) + hC) - 0.5);
       const crk = 1 - smoothstep(0, 0.045, Math.min(tc, lc));
       const lw = (0.5 + 0.9 * dw) * 0.8 * (1 - 0.7 * crk);
-      const wood = [mix(0.03, 0.2, fibre) * lw, mix(0.025, 0.112, fibre) * lw, mix(0.022, 0.066, fibre) * lw];
+      for (let k = 0; k < 3; k++) wood[k] = mix(woodChar[k], woodFibre[k], fibre) * lw;
       const inLog = isWood ? body : 0;
 
       // Lighting of the pile: slow mottling, dark recesses along the gaps, bright edges facing the light
@@ -167,11 +186,10 @@ function makeCracksTexture(size = 384, cells = 6): HTMLCanvasElement {
       const rim1 = (1 - smoothstep(0, 0.09, edge1)) * Math.max((-0.68 * a.ux - 0.74 * a.uy) / (Math.hypot(a.ux, a.uy) || 1), 0);
       const rim2 = (1 - smoothstep(0, 0.05, edge2)) * Math.max((-0.68 * b.ux - 0.74 * b.uy) / (Math.hypot(b.ux, b.uy) || 1), 0);
       const rim = 1 - 0.7 * inLog;
-      const lit = [
-        Math.min(0.26, mix(coal[0], wood[0], inLog) * shade + (0.19 * rim1 + 0.085 * rim2) * rim * 0.8),
-        Math.min(0.26, mix(coal[1], wood[1], inLog) * shade + (0.115 * rim1 + 0.052 * rim2) * rim * 0.8),
-        Math.min(0.26, mix(coal[2], wood[2], inLog) * shade + (0.08 * rim1 + 0.038 * rim2) * rim * 0.8),
-      ];
+      for (let k = 0; k < 3; k++) {
+        const edge = (rimWarm1[k] + rimCool1[k]) * rim1 + (rimWarm2[k] + rimCool2[k]) * rim2;
+        lit[k] = Math.min(0.26, mix(coal[k], wood[k], inLog) * shade + edge * rim * 0.8);
+      }
 
       // Thin glowing gaps between the pieces, and the cracks of the logs: deep red, red at most
       const glow = Math.max(1 - smoothstep(0, 0.03, edge1), crk * inLog * 0.4) * 0.55;
@@ -213,6 +231,8 @@ export class Canvas2DRenderer implements EmberRenderer {
   private pattern: CanvasPattern | null = null;
   private patternScale = 0;
   private k = 1;
+  /** Share of the mask that survives the fades not applied yet (see render). */
+  private keep = 1;
 
   static create(canvas: HTMLCanvasElement): Canvas2DRenderer | null {
     const ctx = canvas.getContext('2d', { alpha: true });
@@ -255,11 +275,17 @@ export class Canvas2DRenderer implements EmberRenderer {
     const w = this.canvas.width;
     const h = this.canvas.height;
 
-    // 1. The mask trail fades with a translucent veil, then the new segments and rings are stamped
-    maskCtx.globalCompositeOperation = 'destination-out';
-    maskCtx.fillStyle = `rgba(0,0,0,${1 - frame.decay})`;
-    maskCtx.fillRect(0, 0, w, h);
-    maskCtx.globalCompositeOperation = 'source-over';
+    // 1. The mask trail fades with a translucent veil, then the new segments and rings are stamped.
+    // A veil under about 6 % rounds to nothing on 8-bit alpha, so the trail would stop fading and leave a ghost
+    // on fast displays (144 Hz and more): the fade of several frames is applied at once.
+    this.keep *= frame.decay;
+    if (1 - this.keep >= 0.06) {
+      maskCtx.globalCompositeOperation = 'destination-out';
+      maskCtx.fillStyle = `rgba(0,0,0,${1 - this.keep})`;
+      maskCtx.fillRect(0, 0, w, h);
+      maskCtx.globalCompositeOperation = 'source-over';
+      this.keep = 1;
+    }
     for (let i = 0; i < frame.segmentCount; i++) {
       const x0 = frame.segments[i * 4] * k;
       const y0 = frame.segments[i * 4 + 1] * k;
@@ -356,6 +382,7 @@ export class Canvas2DRenderer implements EmberRenderer {
   }
 
   clear(): void {
+    this.keep = 1;
     this.maskCtx.clearRect(0, 0, this.mask.width, this.mask.height);
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
   }

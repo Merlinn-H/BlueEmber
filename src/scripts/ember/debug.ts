@@ -43,6 +43,7 @@ export function mountDebug(api: EmberApi): void {
   look.add(p.look, 'ashScale', 80, 600, 1).name('taille des taches');
   look.add(p.look, 'wood', 0, 1, 0.01).name('part de bois');
   look.add(p.look, 'relief', 0, 2, 0.01).name('relief (lumiere)');
+  look.add(p.look, 'cool', 0, 1, 0.01).name('teinte bleue');
   look.add(p.look, 'heat', 0, 12, 0.1).name('chaleur (px)');
   look.add(p.look, 'flicker', 0, 0.5, 0.01).name('scintillement');
   look.add(p.look, 'halo', 0, 2, 0.01).name('lueur du curseur');

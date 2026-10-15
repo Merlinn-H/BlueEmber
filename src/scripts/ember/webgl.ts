@@ -43,7 +43,8 @@ export class WebGLRenderer implements EmberRenderer {
   private trailH = 0;
   private pxRatio = 1;
 
-  static create(canvas: HTMLCanvasElement): WebGLRenderer | null {
+  /** `strict`: no context when the browser would render in software (the caller falls back to the 2D tier). */
+  static create(canvas: HTMLCanvasElement, strict = false): WebGLRenderer | null {
     const gl = canvas.getContext('webgl2', {
       alpha: true,
       premultipliedAlpha: true,
@@ -53,6 +54,7 @@ export class WebGLRenderer implements EmberRenderer {
       // 'default': the ember is a light half-resolution effect, it must not wake a discrete GPU
       powerPreference: 'default',
       preserveDrawingBuffer: false,
+      failIfMajorPerformanceCaveat: strict,
     });
     return gl ? new WebGLRenderer(canvas, gl) : null;
   }
@@ -201,6 +203,7 @@ export class WebGLRenderer implements EmberRenderer {
     gl.uniform1f(this.u(e, 'uGlow'), p.look.glow);
     gl.uniform1f(this.u(e, 'uWood'), p.look.wood);
     gl.uniform1f(this.u(e, 'uRelief'), p.look.relief);
+    gl.uniform1f(this.u(e, 'uCool'), p.look.cool);
     gl.uniform1f(this.u(e, 'uRim'), p.rim.opacity);
     gl.uniform1f(this.u(e, 'uRimPx'), p.rim.width);
     gl.uniform1f(this.u(e, 'uUseTex'), this.hasCracks ? 1 : 0);

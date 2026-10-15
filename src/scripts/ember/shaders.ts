@@ -88,6 +88,7 @@ uniform float uCrust;
 uniform float uGlow;
 uniform float uWood;
 uniform float uRelief;
+uniform float uCool;
 uniform float uRim;
 uniform float uRimPx;
 uniform float uUseTex;
@@ -266,7 +267,9 @@ void main() {
       vec3 H = normalize(L + vec3(0.0, 0.0, 1.0));
 
       // Charcoal: near black and matte. Angular shards (one tilt per facet) softened by two scales of roughness,
-      // tiny pores, and a warm sheen on a few facets that catch the light of the heat.
+      // tiny pores, and a sheen on a few facets. Two lights: the heat of the pointer (warm, strongest where the pointer
+      // is: heatLight) and a cold steel light from the top left, the one of the Ambiance's titane glow, that stays on
+      // the pieces as they cool (uCool is its share, 0 gives the warm brown pile).
       vec2 ft = h22(fid + 5.3) - 0.5;
       vec2 r1 = vec2(vn(p / 11.0), vn(p / 11.0 + 7.1)) - 0.5;
       vec2 r2 = vec2(vn(p / 4.0), vn(p / 4.0 + 3.3)) - 0.5;
@@ -274,9 +277,15 @@ void main() {
       float dc = max(dot(Nc, L), 0.0);
       float sc = pow(max(dot(Nc, H), 0.0), 40.0) * step(0.62, h21(fid + 1.7));
       float pits = smoothstep(0.62, 0.8, vn(p / 3.2 + 13.0));
-      vec3 coal = vec3(0.034, 0.030, 0.028)
-        + vec3(0.120, 0.074, 0.054) * dc * (0.6 + 0.8 * hB.x) * uRelief * heatLight
-        + vec3(0.190, 0.120, 0.085) * sc * uRelief * heatLight;
+      float cool = uCool;
+      float diff = dc * (0.6 + 0.8 * hB.x) * uRelief;
+      float spec = sc * uRelief;
+      float coolLight = 0.5 + 0.5 * hl;
+      vec3 coal = mix(vec3(0.034, 0.030, 0.028), vec3(0.027, 0.031, 0.042), cool)
+        + vec3(0.120, 0.074, 0.054) * diff * heatLight * (1.0 - 0.45 * cool)
+        + vec3(0.056, 0.084, 0.124) * diff * coolLight * cool
+        + vec3(0.190, 0.120, 0.085) * spec * heatLight * (1.0 - 0.35 * cool)
+        + vec3(0.105, 0.155, 0.235) * spec * coolLight * cool;
       coal *= 1.0 - 0.4 * pits;
       coal *= 0.72 + 0.28 * smoothstep(0.0, 0.10, edge2);
       // Thin bright edges on the sides that face the light, on the pieces and on their facets
@@ -298,7 +307,7 @@ void main() {
       float tc = abs(fract(along * 3.4 + 0.35 * vn(vec2(across * 5.0, cid.x * 3.7)) + hB.y) - 0.5);
       float lc = abs(fract(across * 3.6 + 0.25 * vn(vec2(along * 3.0, cid.y * 2.9)) + hB.x) - 0.5);
       float crk = 1.0 - smoothstep(0.0, 0.045, min(tc, lc));
-      vec3 burnt = mix(vec3(0.030, 0.025, 0.022), vec3(0.200, 0.112, 0.066), clamp(fibre, 0.0, 1.0));
+      vec3 burnt = mix(mix(vec3(0.030, 0.025, 0.022), vec3(0.025, 0.026, 0.031), cool), vec3(0.200, 0.112, 0.066), clamp(fibre, 0.0, 1.0));
       vec3 wood = burnt * mix(0.8, 0.5 + 0.9 * dw, uRelief) * (0.45 + 0.55 * heatLight) * (1.0 - 0.7 * crk);
       float inLog = body * isWood;
       transverse = crk * inLog;
@@ -306,7 +315,9 @@ void main() {
       crust = mix(coal, wood, inLog);
       crust *= 0.85 + 0.3 * fbm(pp / uAshScale); // slow mottling
       crust *= 0.55 + 0.45 * smoothstep(0.0, 0.2, edge1); // dark recesses along the gaps between pieces
-      crust += (vec3(0.190, 0.115, 0.080) * rim1 + vec3(0.085, 0.052, 0.038) * rim2) * uRelief * heatLight * (1.0 - 0.7 * inLog);
+      vec3 rimWarm = vec3(0.190, 0.115, 0.080) * rim1 + vec3(0.085, 0.052, 0.038) * rim2;
+      vec3 rimCool = vec3(0.100, 0.148, 0.220) * rim1 + vec3(0.046, 0.068, 0.100) * rim2;
+      crust += (rimWarm * heatLight * (1.0 - 0.5 * cool) + rimCool * coolLight * cool) * uRelief * (1.0 - 0.7 * inLog);
       crust += (h21(floor(p * 0.7) + floor(uTime * 12.0)) - 0.5) * 0.012; // fine moving grain of ash
       crust = min(crust, vec3(0.26)); // never brighter than this: keeps the text above it readable
       // Some charcoal pieces are red hot in patches

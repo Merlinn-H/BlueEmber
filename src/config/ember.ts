@@ -104,6 +104,11 @@ export interface EmberParams {
     wood: number;
     /** Strength of the relief: lighting and sheen of the pieces (0 = flat). */
     relief: number;
+    /**
+     * Blue hue of the charcoal (0 = warm brown only). The pieces are blue-black steel lit from the top left by the cold
+     * light of the Ambiance; the heat of the pointer turns that light warm, and it comes back as the trail cools.
+     */
+    cool: number;
   };
   sparks: {
     max: number;
@@ -155,7 +160,7 @@ export const emberDefaults: EmberParams = {
   brush: { radiusMin: 90, radiusMax: 160, edgeNoise: 0.5 },
   speed: { reference: 1500, minIntensity: 0.55 },
   trail: { tau: 0.55 },
-  look: { crackScale: 125, crackWidth: 0.03, ashScale: 200, heat: 3, flicker: 0.2, halo: 0.5, core: 0.15, crust: 0.8, glow: 0.38, wood: 0.25, relief: 1 },
+  look: { crackScale: 125, crackWidth: 0.03, ashScale: 200, heat: 3, flicker: 0.2, halo: 0.5, core: 0.15, crust: 0.8, glow: 0.38, wood: 0.25, relief: 1, cool: 0.7 },
   sparks: { max: 40, perFrame: 0.3, riseMin: 30, riseMax: 90, lifeMin: 0.9, lifeMax: 1.4, hotShare: 0.2 },
   burst: { radius: 260, duration: 0.6, sparks: 6 },
   zones: { reduce: 0.7, fade: 40, calmCap: 0.15, softCap: 0.5 },
